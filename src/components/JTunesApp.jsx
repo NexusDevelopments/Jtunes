@@ -30,6 +30,8 @@ export default function JTunesApp() {
   const ytPlayerRef = useRef(null);
   const ytReadyRef = useRef(false);
   const progressTimerRef = useRef(null);
+  const resolveCacheRef = useRef(new Map());
+  const resolvePendingRef = useRef(new Map());
 
   const [tracks, setTracks] = useState([]);
   const [artists, setArtists] = useState([]);
@@ -55,6 +57,7 @@ export default function JTunesApp() {
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState("0:00");
   const [duration, setDuration] = useState("0:00");
+  const [resolvingKey, setResolvingKey] = useState("");
 
   const [selectedArtist, setSelectedArtist] = useState(null);
   const [videoModal, setVideoModal] = useState({
@@ -157,6 +160,95 @@ export default function JTunesApp() {
       map.set(item.name, item);
     });
     return map;
+  }
+
+  function buildSearchQuery({ title, artistName }) {
+    return `${title ?? ""} ${artistName ?? ""} official audio`.trim();
+  }
+
+  async function resolveYouTubeIdByQuery(query) {
+    const key = query.toLowerCase();
+    if (!key) {
+      return "";
+    }
+
+    if (resolveCacheRef.current.has(key)) {
+      return resolveCacheRef.current.get(key);
+    }
+
+    if (resolvePendingRef.current.has(key)) {
+      return resolvePendingRef.current.get(key);
+    }
+
+    const pending = (async () => {
+      try {
+        const response = await fetch(`/api/youtube/resolve?q=${encodeURIComponent(query)}`, {
+          cache: "no-store",
+        });
+
+        if (!response.ok) {
+          return "";
+        }
+
+        const payload = await response.json();
+        const videoId = payload.videoId ?? "";
+        if (videoId) {
+          resolveCacheRef.current.set(key, videoId);
+        }
+        return videoId;
+      } catch {
+        return "";
+      } finally {
+        resolvePendingRef.current.delete(key);
+      }
+    })();
+
+    resolvePendingRef.current.set(key, pending);
+    return pending;
+  }
+
+  async function resolveTrackVideoId(track) {
+    if (track.youtubeId) {
+      return track.youtubeId;
+    }
+
+    const query = buildSearchQuery({
+      title: track.title,
+      artistName: track.artist?.name ?? track.artistName,
+    });
+
+    return resolveYouTubeIdByQuery(query);
+  }
+
+  async function ensureTrackVideoId(track) {
+    const resolvedVideoId = await resolveTrackVideoId(track);
+    if (!resolvedVideoId) {
+      return "";
+    }
+
+    if (resolvedVideoId !== track.youtubeId) {
+      setTracks((prev) =>
+        prev.map((item) => (item.id === track.id ? { ...item, youtubeId: resolvedVideoId } : item)),
+      );
+    }
+
+    return resolvedVideoId;
+  }
+
+  function playResolvedVideo(videoId, { shouldAutoplay = true } = {}) {
+    const player = ytPlayerRef.current;
+    if (!player || !ytReadyRef.current || !videoId) {
+      return;
+    }
+
+    if (shouldAutoplay) {
+      player.loadVideoById(videoId);
+      player.playVideo();
+      setIsPlaying(true);
+    } else {
+      player.cueVideoById(videoId);
+      setIsPlaying(false);
+    }
   }
 
   function handleNext() {
@@ -398,53 +490,97 @@ export default function JTunesApp() {
     setArtistOffset((prev) => prev + withMedia.length);
   }
 
-  function playTrackById(trackId) {
+  async function playTrackById(trackId) {
     const index = tracks.findIndex((track) => track.id === trackId);
     if (index < 0) return;
 
     const track = tracks[index];
+    const key = `track-${track.id}`;
+
+    setResolvingKey(key);
+
+    const resolvedVideoId = await ensureTrackVideoId(track);
+    if (!resolvedVideoId) {
+      setResolvingKey("");
+      return;
+    }
 
     setCurrentIndex(index);
-    setIsPlaying(false);
     stopProgressWatcher();
 
-    setVideoModal({
-      open: true,
-      youtubeId: track.youtubeId,
-      title: track.title,
-      artist: track.artist?.name ?? "",
-      searchQuery: "",
+    if (ytReadyRef.current && ytPlayerRef.current) {
+      playResolvedVideo(resolvedVideoId, { shouldAutoplay: true });
+    }
+
+    setVideoModal({ open: false, youtubeId: "", title: "", artist: "", searchQuery: "" });
+    setResolvingKey("");
+  }
+
+  async function playExternalResult(item) {
+    const query = buildSearchQuery({
+      title: item.title,
+      artistName: item.artistName ?? item.source,
     });
 
-    if (ytReadyRef.current && ytPlayerRef.current) {
-      ytPlayerRef.current.pauseVideo();
+    if (!query) {
+      return;
     }
 
-    if (index === currentIndex && ytReadyRef.current && ytPlayerRef.current) {
-      ytPlayerRef.current.pauseVideo();
+    const key = `external-${item.id}`;
+    setResolvingKey(key);
+
+    const resolvedVideoId = await resolveYouTubeIdByQuery(query);
+    if (!resolvedVideoId) {
+      setResolvingKey("");
+      return;
     }
+
+    const candidate = {
+      id: `yt-${resolvedVideoId}`,
+      title: item.title,
+      artistId: "external",
+      albumId: "external",
+      genre: item.source ?? "YouTube",
+      duration: "0:00",
+      cover: `https://i.ytimg.com/vi/${resolvedVideoId}/hqdefault.jpg`,
+      plays: 0,
+      youtubeId: resolvedVideoId,
+      artist: {
+        id: `external-artist-${item.id}`,
+        name: item.artistName ?? item.source ?? "YouTube",
+        followers: 0,
+        monthlyListeners: 0,
+      },
+    };
+
+    let nextIndex = 0;
+    setTracks((prev) => {
+      const existingIndex = prev.findIndex((track) => track.youtubeId === resolvedVideoId);
+      if (existingIndex >= 0) {
+        nextIndex = existingIndex;
+        return prev;
+      }
+
+      nextIndex = prev.length;
+      return [...prev, candidate];
+    });
+
+    setCurrentIndex(nextIndex);
+    stopProgressWatcher();
+
+    if (ytReadyRef.current && ytPlayerRef.current) {
+      playResolvedVideo(resolvedVideoId, { shouldAutoplay: true });
+    }
+
+    setVideoModal({ open: false, youtubeId: "", title: "", artist: "", searchQuery: "" });
+    setResolvingKey("");
   }
 
   function closeVideoModal() {
     setVideoModal({ open: false, youtubeId: "", title: "", artist: "", searchQuery: "" });
   }
 
-  function playYouTubeSearchResult(item) {
-    const query = `${item.title} ${item.artistName ?? ""}`.trim();
-    if (!query) {
-      return;
-    }
-
-    setVideoModal({
-      open: true,
-      youtubeId: "",
-      title: item.title,
-      artist: item.artistName ?? item.source,
-      searchQuery: query,
-    });
-  }
-
-  function togglePlay() {
+  async function togglePlay() {
     const player = ytPlayerRef.current;
     if (!player || !ytReadyRef.current || !tracks.length) return;
 
@@ -461,8 +597,19 @@ export default function JTunesApp() {
       return;
     }
 
+    let playableVideoId = currentTrack.youtubeId;
+    if (!playableVideoId) {
+      const key = `track-${currentTrack.id}`;
+      setResolvingKey(key);
+      playableVideoId = await ensureTrackVideoId(currentTrack);
+      setResolvingKey("");
+      if (!playableVideoId) {
+        return;
+      }
+    }
+
     if (state === window.YT.PlayerState.UNSTARTED || state === window.YT.PlayerState.CUED) {
-      player.loadVideoById(currentTrack.youtubeId);
+      player.loadVideoById(playableVideoId);
     }
 
     player.playVideo();
@@ -628,8 +775,9 @@ export default function JTunesApp() {
                           aria-label="Play track"
                           title="Play"
                           onClick={() => playTrackById(track.id)}
+                          disabled={resolvingKey === `track-${track.id}`}
                         >
-                          &gt;
+                          {resolvingKey === `track-${track.id}` ? "..." : ">"}
                         </button>
                         <button
                           className="icon-btn"
@@ -661,8 +809,12 @@ export default function JTunesApp() {
                         <span>{item.title}</span>
                         <span>{item.artistName || item.source}</span>
                         <span>{item.source}</span>
-                        <button className="inline-play-btn" onClick={() => playYouTubeSearchResult(item)}>
-                          Play
+                        <button
+                          className="inline-play-btn"
+                          onClick={() => playExternalResult(item)}
+                          disabled={resolvingKey === `external-${item.id}`}
+                        >
+                          {resolvingKey === `external-${item.id}` ? "..." : "Play"}
                         </button>
                       </div>
                     ))}
@@ -671,8 +823,12 @@ export default function JTunesApp() {
                         <span>{item.title}</span>
                         <span>{item.artistName || "Album"}</span>
                         <span>{item.source}</span>
-                        <button className="inline-play-btn" onClick={() => playYouTubeSearchResult(item)}>
-                          Play
+                        <button
+                          className="inline-play-btn"
+                          onClick={() => playExternalResult(item)}
+                          disabled={resolvingKey === `external-${item.id}`}
+                        >
+                          {resolvingKey === `external-${item.id}` ? "..." : "Play"}
                         </button>
                       </div>
                     ))}
@@ -719,8 +875,9 @@ export default function JTunesApp() {
                           aria-label="Play track"
                           title="Play"
                           onClick={() => playTrackById(track.id)}
+                          disabled={resolvingKey === `track-${track.id}`}
                         >
-                          &gt;
+                          {resolvingKey === `track-${track.id}` ? "..." : ">"}
                         </button>
                         <button
                           className="icon-btn"
@@ -800,7 +957,9 @@ export default function JTunesApp() {
                     .map((track) => (
                       <li key={track.id}>
                         <span>{track.title}</span>
-                        <button onClick={() => playTrackById(track.id)}>&gt;</button>
+                        <button onClick={() => playTrackById(track.id)} disabled={resolvingKey === `track-${track.id}`}>
+                          {resolvingKey === `track-${track.id}` ? "..." : ">"}
+                        </button>
                       </li>
                     ))}
                 </ul>
