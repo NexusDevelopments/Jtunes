@@ -781,6 +781,18 @@ button {
   background: rgba(17, 22, 29, 0.95);
 }
 
+.external-results {
+  margin-top: 12px;
+  border-top: 1px solid rgba(121, 155, 199, 0.2);
+  padding-top: 10px;
+}
+
+.provider-strip {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
 @media (max-width: 620px) {
   .youtube-mini {
     width: 2px;

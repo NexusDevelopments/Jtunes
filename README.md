@@ -59,6 +59,37 @@ npx vercel
 - `GET /api/tracks/:id`
 - `GET /api/artists`
 - `GET /api/artists/:id`
+- `GET /api/albums`
+- `GET /api/albums/:id`
+- `GET /api/songs`
+- `GET /api/songs/:id`
+- `GET /api/artist-media?name=`
+- `GET /api/discovery/search?q=&limit=`
+
+## Federated Music Sources
+
+The project includes a federated search layer that can aggregate metadata from:
+
+- Free Music Archive (`FMA_API_KEY`)
+- MusicBrainz (public API)
+- Jamendo (`JAMENDO_CLIENT_ID`)
+- Internet Archive (public API)
+- Genius (`GENIUS_ACCESS_TOKEN`)
+- Discogs (`DISCOGS_USER_TOKEN`)
+- Spotify (`SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET`)
+
+Optional local environment variables:
+
+```bash
+SPOTIFY_CLIENT_ID=
+SPOTIFY_CLIENT_SECRET=
+JAMENDO_CLIENT_ID=
+GENIUS_ACCESS_TOKEN=
+DISCOGS_USER_TOKEN=
+FMA_API_KEY=
+```
+
+Without tokens, public providers still work and token-protected providers are skipped.
 
 ## Important Note on Music Rights
 This template is wired with publicly accessible sample audio URLs for demo playback behavior.

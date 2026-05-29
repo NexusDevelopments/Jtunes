@@ -40,6 +40,7 @@ export default function JTunesApp() {
 
   const [searchTracks, setSearchTracks] = useState([]);
   const [searchArtists, setSearchArtists] = useState([]);
+  const [externalSearch, setExternalSearch] = useState({ tracks: [], artists: [], albums: [], providers: {} });
 
   const [totalTracks, setTotalTracks] = useState(0);
   const [totalArtists, setTotalArtists] = useState(0);
@@ -212,6 +213,7 @@ export default function JTunesApp() {
     if (!q) {
       setSearchTracks([]);
       setSearchArtists([]);
+      setExternalSearch({ tracks: [], artists: [], albums: [], providers: {} });
       return;
     }
 
@@ -223,8 +225,13 @@ export default function JTunesApp() {
         fetch(`/api/artists?q=${encodeURIComponent(q)}&limit=40&offset=0`, { cache: "no-store" }),
       ]);
 
+      const discoveryRes = await fetch(`/api/discovery/search?q=${encodeURIComponent(q)}&limit=12`, {
+        cache: "no-store",
+      });
+
       const tracksData = await tracksRes.json();
       const artistsData = await artistsRes.json();
+      const discoveryData = discoveryRes.ok ? await discoveryRes.json() : { tracks: [], artists: [], albums: [], providers: {} };
 
       if (cancelled) {
         return;
@@ -243,6 +250,12 @@ export default function JTunesApp() {
       if (!cancelled) {
         setSearchTracks(foundTracks);
         setSearchArtists(foundArtistsWithMedia);
+        setExternalSearch({
+          tracks: discoveryData.tracks ?? [],
+          artists: discoveryData.artists ?? [],
+          albums: discoveryData.albums ?? [],
+          providers: discoveryData.providers ?? {},
+        });
       }
     }
 
@@ -589,6 +602,32 @@ export default function JTunesApp() {
                   </article>
                 ))}
               </div>
+
+              {hasSearch && (externalSearch.tracks.length || externalSearch.artists.length || externalSearch.albums.length) ? (
+                <section className="external-results">
+                  <div className="section-title">
+                    <h3>Web Music Results</h3>
+                    <p className="provider-strip">Spotify, MusicBrainz, Jamendo, Archive, Genius, Discogs, FMA</p>
+                  </div>
+
+                  <div className="detail-list">
+                    {externalSearch.tracks.slice(0, 12).map((item) => (
+                      <a key={item.id} className="detail-row" href={item.externalUrl || "#"} target="_blank" rel="noreferrer">
+                        <span>{item.title}</span>
+                        <span>{item.artistName || item.source}</span>
+                        <span>{item.source}</span>
+                      </a>
+                    ))}
+                    {externalSearch.albums.slice(0, 8).map((item) => (
+                      <a key={item.id} className="detail-row" href={item.externalUrl || "#"} target="_blank" rel="noreferrer">
+                        <span>{item.title}</span>
+                        <span>{item.artistName || "Album"}</span>
+                        <span>{item.source}</span>
+                      </a>
+                    ))}
+                  </div>
+                </section>
+              ) : null}
             </section>
           )}
 

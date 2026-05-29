@@ -1,7 +1,7 @@
 let cachedToken = null;
 let cachedExpiresAt = 0;
 
-async function getSpotifyToken() {
+export async function getSpotifyToken() {
   const clientId = process.env.SPOTIFY_CLIENT_ID;
   const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 
@@ -63,5 +63,70 @@ export async function getSpotifyArtistMediaByName(name) {
     image: artist.images?.[0]?.url ?? "",
     externalUrl: artist.external_urls?.spotify ?? "",
     id: artist.id,
+  };
+}
+
+export async function searchSpotifyCatalog(query, limit = 10) {
+  const token = await getSpotifyToken();
+  if (!token) {
+    return {
+      tracks: [],
+      artists: [],
+      albums: [],
+      meta: { enabled: false },
+    };
+  }
+
+  const endpoint = `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=artist,track,album&limit=${limit}`;
+  const response = await fetch(endpoint, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    return {
+      tracks: [],
+      artists: [],
+      albums: [],
+      meta: { enabled: true, ok: false },
+    };
+  }
+
+  const payload = await response.json();
+
+  const artists = (payload?.artists?.items ?? []).map((artist) => ({
+    id: `spotify-artist-${artist.id}`,
+    name: artist.name,
+    pfp: artist.images?.[0]?.url ?? "",
+    source: "spotify",
+    externalUrl: artist.external_urls?.spotify ?? "https://spotify.com",
+  }));
+
+  const tracks = (payload?.tracks?.items ?? []).map((track) => ({
+    id: `spotify-track-${track.id}`,
+    title: track.name,
+    artistName: track.artists?.[0]?.name ?? "Unknown",
+    albumTitle: track.album?.name ?? "",
+    source: "spotify",
+    externalUrl: track.external_urls?.spotify ?? "https://spotify.com",
+    previewUrl: track.preview_url ?? "",
+  }));
+
+  const albums = (payload?.albums?.items ?? []).map((album) => ({
+    id: `spotify-album-${album.id}`,
+    title: album.name,
+    artistName: album.artists?.[0]?.name ?? "Unknown",
+    cover: album.images?.[0]?.url ?? "",
+    source: "spotify",
+    externalUrl: album.external_urls?.spotify ?? "https://spotify.com",
+  }));
+
+  return {
+    tracks,
+    artists,
+    albums,
+    meta: { enabled: true, ok: true },
   };
 }
