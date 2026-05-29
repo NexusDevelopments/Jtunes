@@ -57,6 +57,7 @@ export default function JTunesApp() {
   const [duration, setDuration] = useState("0:00");
 
   const [selectedArtist, setSelectedArtist] = useState(null);
+  const [videoModal, setVideoModal] = useState({ open: false, youtubeId: "", title: "", artist: "" });
 
   const currentTrack = tracks[currentIndex] ?? null;
   const hasSearch = search.trim().length > 0;
@@ -395,12 +396,30 @@ export default function JTunesApp() {
     const index = tracks.findIndex((track) => track.id === trackId);
     if (index < 0) return;
 
+    const track = tracks[index];
+
     setCurrentIndex(index);
-    setIsPlaying(true);
+    setIsPlaying(false);
+    stopProgressWatcher();
+
+    setVideoModal({
+      open: true,
+      youtubeId: track.youtubeId,
+      title: track.title,
+      artist: track.artist?.name ?? "",
+    });
+
+    if (ytReadyRef.current && ytPlayerRef.current) {
+      ytPlayerRef.current.pauseVideo();
+    }
 
     if (index === currentIndex && ytReadyRef.current && ytPlayerRef.current) {
-      ytPlayerRef.current.playVideo();
+      ytPlayerRef.current.pauseVideo();
     }
+  }
+
+  function closeVideoModal() {
+    setVideoModal({ open: false, youtubeId: "", title: "", artist: "" });
   }
 
   function togglePlay() {
@@ -758,6 +777,27 @@ export default function JTunesApp() {
           </div>
         </section>
       )}
+
+      {videoModal.open ? (
+        <section className="video-modal" onClick={closeVideoModal}>
+          <div className="video-modal-card glass" onClick={(event) => event.stopPropagation()}>
+            <button className="close-btn" onClick={closeVideoModal}>X</button>
+            <div className="video-modal-meta">
+              <h3>{videoModal.title}</h3>
+              <p>{videoModal.artist}</p>
+            </div>
+            <div className="video-frame-wrap">
+              <iframe
+                src={`https://www.youtube.com/embed/${videoModal.youtubeId}?autoplay=1&rel=0`}
+                title={videoModal.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <footer className="player glass">
         <div className="now-playing">
