@@ -57,7 +57,13 @@ export default function JTunesApp() {
   const [duration, setDuration] = useState("0:00");
 
   const [selectedArtist, setSelectedArtist] = useState(null);
-  const [videoModal, setVideoModal] = useState({ open: false, youtubeId: "", title: "", artist: "" });
+  const [videoModal, setVideoModal] = useState({
+    open: false,
+    youtubeId: "",
+    title: "",
+    artist: "",
+    searchQuery: "",
+  });
 
   const currentTrack = tracks[currentIndex] ?? null;
   const hasSearch = search.trim().length > 0;
@@ -407,6 +413,7 @@ export default function JTunesApp() {
       youtubeId: track.youtubeId,
       title: track.title,
       artist: track.artist?.name ?? "",
+      searchQuery: "",
     });
 
     if (ytReadyRef.current && ytPlayerRef.current) {
@@ -419,7 +426,22 @@ export default function JTunesApp() {
   }
 
   function closeVideoModal() {
-    setVideoModal({ open: false, youtubeId: "", title: "", artist: "" });
+    setVideoModal({ open: false, youtubeId: "", title: "", artist: "", searchQuery: "" });
+  }
+
+  function playYouTubeSearchResult(item) {
+    const query = `${item.title} ${item.artistName ?? ""}`.trim();
+    if (!query) {
+      return;
+    }
+
+    setVideoModal({
+      open: true,
+      youtubeId: "",
+      title: item.title,
+      artist: item.artistName ?? item.source,
+      searchQuery: query,
+    });
   }
 
   function togglePlay() {
@@ -487,6 +509,10 @@ export default function JTunesApp() {
   };
 
   const visibleArtists = hasSearch ? searchArtists : artists;
+
+  const videoEmbedSrc = videoModal.youtubeId
+    ? `https://www.youtube.com/embed/${videoModal.youtubeId}?autoplay=1&rel=0`
+    : `https://www.youtube.com/embed?autoplay=1&listType=search&list=${encodeURIComponent(videoModal.searchQuery)}`;
 
   return (
     <>
@@ -631,18 +657,24 @@ export default function JTunesApp() {
 
                   <div className="detail-list">
                     {externalSearch.tracks.slice(0, 12).map((item) => (
-                      <a key={item.id} className="detail-row" href={item.externalUrl || "#"} target="_blank" rel="noreferrer">
+                      <div key={item.id} className="detail-row actionable-row">
                         <span>{item.title}</span>
                         <span>{item.artistName || item.source}</span>
                         <span>{item.source}</span>
-                      </a>
+                        <button className="inline-play-btn" onClick={() => playYouTubeSearchResult(item)}>
+                          Play
+                        </button>
+                      </div>
                     ))}
                     {externalSearch.albums.slice(0, 8).map((item) => (
-                      <a key={item.id} className="detail-row" href={item.externalUrl || "#"} target="_blank" rel="noreferrer">
+                      <div key={item.id} className="detail-row actionable-row">
                         <span>{item.title}</span>
                         <span>{item.artistName || "Album"}</span>
                         <span>{item.source}</span>
-                      </a>
+                        <button className="inline-play-btn" onClick={() => playYouTubeSearchResult(item)}>
+                          Play
+                        </button>
+                      </div>
                     ))}
                   </div>
                 </section>
@@ -788,7 +820,7 @@ export default function JTunesApp() {
             </div>
             <div className="video-frame-wrap">
               <iframe
-                src={`https://www.youtube.com/embed/${videoModal.youtubeId}?autoplay=1&rel=0`}
+                src={videoEmbedSrc}
                 title={videoModal.title}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 referrerPolicy="strict-origin-when-cross-origin"

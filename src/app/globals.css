@@ -821,6 +821,21 @@ button {
   background: rgba(17, 22, 29, 0.95);
 }
 
+.actionable-row {
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
+}
+
+.inline-play-btn {
+  border: 1px solid var(--stroke);
+  border-radius: 999px;
+  padding: 5px 10px;
+  color: var(--text);
+  background: linear-gradient(90deg, var(--blue), var(--blue-2));
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
 .external-results {
   margin-top: 12px;
   border-top: 1px solid rgba(121, 155, 199, 0.2);
