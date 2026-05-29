@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { getArtistById } from "@/lib/api";
 
-export function GET(_request, { params }) {
-  const result = getArtistById(params.id);
+export async function GET(_request, { params }) {
+  const { id } = await params;
+  const result = getArtistById(id);
 
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: result.status });

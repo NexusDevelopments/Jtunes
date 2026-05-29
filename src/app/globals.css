@@ -910,6 +910,34 @@ button {
   gap: 8px;
 }
 
+.artist-song-row {
+  display: grid;
+  grid-template-columns: 54px 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid var(--stroke);
+  border-radius: 10px;
+  padding: 8px;
+  background: rgba(17, 22, 29, 0.95);
+}
+
+.artist-song-row img {
+  width: 54px;
+  height: 54px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.artist-song-meta h3 {
+  font-size: 0.95rem;
+}
+
+.artist-song-meta p {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
 .detail-row {
   display: grid;
   grid-template-columns: 1fr auto auto;

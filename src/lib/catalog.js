@@ -88,7 +88,12 @@ export const tracks = [
   { id: "t35", title: "Noonie World", artistId: "lil-noonie", albumId: "noonie-nights", genre: "Rap", duration: "2:32", cover: "https://images.unsplash.com/photo-1499415479124-43c32433a620?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 13000000 },
   { id: "t36", title: "Late Night Spin", artistId: "lil-noonie", albumId: "noonie-nights", genre: "Melodic Rap", duration: "2:58", cover: "https://images.unsplash.com/photo-1499415479124-43c32433a620?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 8700000 },
   { id: "t37", title: "Top Pop Out", artistId: "topoppgen", albumId: "pop-gen", genre: "Rap", duration: "2:27", cover: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 9800000 },
-  { id: "t38", title: "Run It Up", artistId: "topoppgen", albumId: "pop-gen", genre: "Trap", duration: "2:44", cover: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 8400000 }
+  { id: "t38", title: "Run It Up", artistId: "topoppgen", albumId: "pop-gen", genre: "Trap", duration: "2:44", cover: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 8400000 },
+  { id: "t39", title: "Take Over Nights", artistId: "lil-take", albumId: "take-season", genre: "Trap", duration: "2:54", cover: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 9100000 },
+  { id: "t40", title: "Fatso Anthem", artistId: "yfg-fatso", albumId: "fatso-files", genre: "Rap", duration: "2:47", cover: "https://images.unsplash.com/photo-1461784180009-21121b2f204c?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 10300000 },
+  { id: "t41", title: "Scoring Drill", artistId: "dee-scoring", albumId: "scoreboard-season", genre: "Drill", duration: "2:29", cover: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 7600000 },
+  { id: "t42", title: "Noonie Slide", artistId: "lil-noonie", albumId: "noonie-nights", genre: "Rap", duration: "2:41", cover: "https://images.unsplash.com/photo-1499415479124-43c32433a620?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 6900000 },
+  { id: "t43", title: "Topopp Bounce", artistId: "topoppgen", albumId: "pop-gen", genre: "Rap", duration: "2:36", cover: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 6400000 }
 ];
 
 export const artistById = Object.fromEntries(artists.map((artist) => [artist.id, artist]));
