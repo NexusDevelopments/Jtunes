@@ -37,6 +37,9 @@ export default function JTunesApp() {
   const [search, setSearch] = useState("");
   const [genreOptions, setGenreOptions] = useState([]);
 
+  const [searchTracks, setSearchTracks] = useState([]);
+  const [searchArtists, setSearchArtists] = useState([]);
+
   const [totalTracks, setTotalTracks] = useState(0);
   const [totalArtists, setTotalArtists] = useState(0);
   const [indexedTracks, setIndexedTracks] = useState(0);
@@ -54,6 +57,7 @@ export default function JTunesApp() {
   const [selectedArtist, setSelectedArtist] = useState(null);
 
   const currentTrack = tracks[currentIndex] ?? null;
+  const hasSearch = search.trim().length > 0;
 
   function stopProgressWatcher() {
     if (progressTimerRef.current) {
@@ -79,7 +83,7 @@ export default function JTunesApp() {
       if (total > 0) {
         setProgress((seconds / total) * 100);
       }
-    }, 450);
+    }, 420);
   }
 
   function playCurrentTrack(autoplay) {
@@ -101,6 +105,51 @@ export default function JTunesApp() {
     }
   }
 
+  function applyArtistMedia(baseArtists, mediaByName) {
+    return baseArtists.map((artist) => {
+      const media = mediaByName.get(artist.name.toLowerCase());
+      if (!media) {
+        return artist;
+      }
+
+      return {
+        ...artist,
+        pfp: media.thumb || media.fanart || artist.pfp,
+        logo: media.logo || "",
+      };
+    });
+  }
+
+  async function fetchArtistMediaByName(names) {
+    const uniqueNames = [...new Set(names.map((name) => name.trim()).filter(Boolean))];
+    if (!uniqueNames.length) {
+      return new Map();
+    }
+
+    const responses = await Promise.all(
+      uniqueNames.map(async (name) => {
+        try {
+          const res = await fetch(`/api/artist-media?name=${encodeURIComponent(name)}`, {
+            cache: "no-store",
+          });
+          if (!res.ok) {
+            return null;
+          }
+          const data = await res.json();
+          return { name: name.toLowerCase(), ...data };
+        } catch {
+          return null;
+        }
+      }),
+    );
+
+    const map = new Map();
+    responses.filter(Boolean).forEach((item) => {
+      map.set(item.name, item);
+    });
+    return map;
+  }
+
   function handleNext() {
     if (!tracks.length) return;
     setCurrentIndex((prev) => (prev + 1) % tracks.length);
@@ -111,7 +160,7 @@ export default function JTunesApp() {
     async function boot() {
       const [tracksRes, artistsRes] = await Promise.all([
         fetch("/api/tracks?limit=60&offset=0", { cache: "no-store" }),
-        fetch("/api/artists?limit=30&offset=0", { cache: "no-store" }),
+        fetch("/api/artists?limit=40&offset=0", { cache: "no-store" }),
       ]);
 
       const tracksData = await tracksRes.json();
@@ -120,22 +169,31 @@ export default function JTunesApp() {
       const trackItems = tracksData.items ?? [];
       const artistItems = artistsData.items ?? [];
 
-      setTracks(trackItems);
-      setArtists(artistItems);
-      setTotalTracks(tracksData.total ?? trackItems.length);
-      setTotalArtists(artistsData.total ?? artistItems.length);
+      const artistMedia = await fetchArtistMediaByName(artistItems.map((artist) => artist.name));
+      const artistItemsWithMedia = applyArtistMedia(artistItems, artistMedia);
+
+      const trackItemsWithMedia = trackItems.map((track) => ({
+        ...track,
+        artist:
+          artistItemsWithMedia.find((artist) => artist.id === track.artistId) ?? track.artist,
+      }));
+
+      setTracks(trackItemsWithMedia);
+      setArtists(artistItemsWithMedia);
+      setTotalTracks(tracksData.total ?? trackItemsWithMedia.length);
+      setTotalArtists(artistsData.total ?? artistItemsWithMedia.length);
       setIndexedTracks(tracksData.catalogMetrics?.indexedTracks ?? 0);
       setIndexedArtists(tracksData.catalogMetrics?.indexedArtists ?? 0);
-      setTrackOffset(trackItems.length);
-      setArtistOffset(artistItems.length);
+      setTrackOffset(trackItemsWithMedia.length);
+      setArtistOffset(artistItemsWithMedia.length);
 
       const nextGenres = tracksData.genres?.length
         ? tracksData.genres
-        : [...new Set(trackItems.map((track) => track.genre))];
+        : [...new Set(trackItemsWithMedia.map((track) => track.genre))];
       setGenreOptions(nextGenres);
 
-      if (trackItems.length) {
-        setActiveGenre(trackItems[0].genre);
+      if (trackItemsWithMedia.length) {
+        setActiveGenre(trackItemsWithMedia[0].genre);
       }
     }
 
@@ -149,6 +207,52 @@ export default function JTunesApp() {
   }, [activeGenre, genreOptions]);
 
   useEffect(() => {
+    const q = search.trim();
+    if (!q) {
+      setSearchTracks([]);
+      setSearchArtists([]);
+      return;
+    }
+
+    let cancelled = false;
+
+    async function runSearch() {
+      const [tracksRes, artistsRes] = await Promise.all([
+        fetch(`/api/tracks?q=${encodeURIComponent(q)}&limit=80&offset=0`, { cache: "no-store" }),
+        fetch(`/api/artists?q=${encodeURIComponent(q)}&limit=40&offset=0`, { cache: "no-store" }),
+      ]);
+
+      const tracksData = await tracksRes.json();
+      const artistsData = await artistsRes.json();
+
+      if (cancelled) {
+        return;
+      }
+
+      const foundArtists = artistsData.items ?? [];
+      const artistMedia = await fetchArtistMediaByName(foundArtists.map((artist) => artist.name));
+      const foundArtistsWithMedia = applyArtistMedia(foundArtists, artistMedia);
+
+      const foundTracks = (tracksData.items ?? []).map((track) => ({
+        ...track,
+        artist:
+          foundArtistsWithMedia.find((artist) => artist.id === track.artistId) ?? track.artist,
+      }));
+
+      if (!cancelled) {
+        setSearchTracks(foundTracks);
+        setSearchArtists(foundArtistsWithMedia);
+      }
+    }
+
+    runSearch();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [search]);
+
+  useEffect(() => {
     if (!tracks.length) {
       return undefined;
     }
@@ -159,8 +263,8 @@ export default function JTunesApp() {
       }
 
       ytPlayerRef.current = new window.YT.Player("yt-player-host", {
-        width: "160",
-        height: "90",
+        width: "120",
+        height: "68",
         videoId: tracks[0].youtubeId,
         playerVars: {
           autoplay: 0,
@@ -236,22 +340,16 @@ export default function JTunesApp() {
     playCurrentTrack(isPlaying);
   }, [currentTrack]);
 
-  const searchedTracks = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    if (!q) return tracks;
-
-    return tracks.filter((track) => {
-      return (
-        track.title.toLowerCase().includes(q) ||
-        track.genre.toLowerCase().includes(q) ||
-        track.artist?.name?.toLowerCase().includes(q)
-      );
-    });
-  }, [search, tracks]);
+  const filteredTracks = useMemo(() => {
+    if (hasSearch) {
+      return searchTracks;
+    }
+    return tracks;
+  }, [hasSearch, searchTracks, tracks]);
 
   const genreTracks = useMemo(
-    () => tracks.filter((track) => track.genre === activeGenre),
-    [tracks, activeGenre],
+    () => filteredTracks.filter((track) => track.genre === activeGenre),
+    [filteredTracks, activeGenre],
   );
 
   async function loadMoreTracks() {
@@ -272,8 +370,11 @@ export default function JTunesApp() {
     const data = await response.json();
     const items = data.items ?? [];
 
-    setArtists((prev) => appendUnique(prev, items));
-    setArtistOffset((prev) => prev + items.length);
+    const artistMedia = await fetchArtistMediaByName(items.map((artist) => artist.name));
+    const withMedia = applyArtistMedia(items, artistMedia);
+
+    setArtists((prev) => appendUnique(prev, withMedia));
+    setArtistOffset((prev) => prev + withMedia.length);
   }
 
   function playTrackById(trackId) {
@@ -344,13 +445,15 @@ export default function JTunesApp() {
     },
     genres: {
       title: "Genres",
-      subtitle: "Rap-only lanes: trap, drill, boom bap and more",
+      subtitle: "Rap-only lanes",
     },
     artists: {
       title: "Artists",
-      subtitle: "Only real rapper profiles, albums and songs",
+      subtitle: "Real rapper profiles and songs",
     },
   };
+
+  const visibleArtists = hasSearch ? searchArtists : artists;
 
   return (
     <>
@@ -404,12 +507,12 @@ export default function JTunesApp() {
               <p>{viewMeta[activeView].subtitle}</p>
             </div>
             <label className="search-wrap">
-              <span>Search</span>
+              <span>Search Songs And Artists</span>
               <input
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 type="search"
-                placeholder="Search rapper or song"
+                placeholder="Search in general"
               />
             </label>
           </header>
@@ -420,7 +523,7 @@ export default function JTunesApp() {
                 <h3>Popular Rappers</h3>
               </div>
               <div className="artist-strip">
-                {artists
+                {visibleArtists
                   .slice()
                   .sort((a, b) => b.monthlyListeners - a.monthlyListeners)
                   .slice(0, 12)
@@ -430,7 +533,7 @@ export default function JTunesApp() {
                       className="artist-chip"
                       onClick={() => setSelectedArtist(artist)}
                     >
-                      <img src={artist.pfp} alt={artist.name} />
+                      <img src={artist.logo || artist.pfp} alt={artist.name} />
                       <div>
                         <h4>{artist.name}</h4>
                         <p>{formatCompact(artist.monthlyListeners)} listeners</p>
@@ -446,7 +549,7 @@ export default function JTunesApp() {
                 </button>
               </div>
               <div className="song-grid">
-                {searchedTracks.map((track) => (
+                {filteredTracks.map((track) => (
                   <article key={track.id} className="song-card">
                     <img src={track.cover} alt={track.title} />
                     <div className="song-card-content">
@@ -550,9 +653,9 @@ export default function JTunesApp() {
                 </button>
               </div>
               <div className="artist-grid">
-                {artists.map((artist) => (
+                {visibleArtists.map((artist) => (
                   <article className="artist-card" key={artist.id}>
-                    <img src={artist.pfp} alt={artist.name} />
+                    <img src={artist.logo || artist.pfp} alt={artist.name} />
                     <h4>{artist.name}</h4>
                     <p>{formatCompact(artist.monthlyListeners)} monthly listeners</p>
                     <p>{formatCompact(artist.followers)} followers</p>
@@ -572,7 +675,7 @@ export default function JTunesApp() {
               X
             </button>
             <div className="artist-head">
-              <img src={selectedArtist.pfp} alt={selectedArtist.name} />
+              <img src={selectedArtist.logo || selectedArtist.pfp} alt={selectedArtist.name} />
               <div>
                 <h3>{selectedArtist.name}</h3>
                 <p>

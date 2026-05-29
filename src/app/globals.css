@@ -97,16 +97,17 @@ button {
 
 .youtube-mini {
   position: fixed;
-  right: 12px;
-  bottom: 102px;
-  width: 120px;
-  height: 68px;
-  border-radius: 10px;
+  right: 4px;
+  bottom: 86px;
+  width: 2px;
+  height: 2px;
+  border-radius: 2px;
   overflow: hidden;
-  opacity: 0.18;
-  border: 1px solid rgba(121, 155, 199, 0.22);
+  opacity: 0.01;
+  border: none;
   z-index: 15;
   background: #000;
+  pointer-events: none;
 }
 
 .app-shell {
@@ -114,15 +115,15 @@ button {
   z-index: 1;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 14px;
-  padding: 12px 12px 148px;
+  gap: 12px;
+  padding: 10px 10px 132px;
 }
 
 .sidebar {
-  border-radius: 18px;
-  padding: 14px;
+  border-radius: 14px;
+  padding: 11px;
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .brand-wrap {
@@ -178,9 +179,9 @@ button {
 }
 
 .stats-grid article {
-  border-radius: 10px;
+  border-radius: 8px;
   border: 1px solid var(--stroke);
-  padding: 8px;
+  padding: 6px;
   background: rgba(16, 20, 27, 0.85);
 }
 
@@ -198,14 +199,14 @@ button {
 
 .content {
   display: grid;
-  gap: 14px;
+  gap: 10px;
 }
 
 .topbar {
-  border-radius: 14px;
-  padding: 12px;
+  border-radius: 12px;
+  padding: 10px;
   display: grid;
-  gap: 12px;
+  gap: 8px;
 }
 
 .topbar p {
@@ -230,8 +231,8 @@ button {
 }
 
 .panel {
-  border-radius: 14px;
-  padding: 12px;
+  border-radius: 12px;
+  padding: 10px;
   animation: panel-in 0.24s ease;
 }
 
@@ -251,7 +252,7 @@ button {
   justify-content: space-between;
   align-items: center;
   gap: 8px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .load-btn {
@@ -267,15 +268,15 @@ button {
 .artist-strip {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
 .artist-chip {
   border: 1px solid var(--stroke);
-  border-radius: 12px;
+  border-radius: 10px;
   background: linear-gradient(165deg, rgba(24, 30, 40, 0.96), rgba(14, 18, 24, 0.95));
-  padding: 9px;
+  padding: 7px;
   color: inherit;
   cursor: pointer;
   display: flex;
@@ -298,11 +299,11 @@ button {
 .song-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 12px;
+  gap: 10px;
 }
 
 .song-card {
-  border-radius: 12px;
+  border-radius: 10px;
   overflow: hidden;
   border: 1px solid var(--stroke);
   background: linear-gradient(180deg, rgba(23, 29, 39, 0.95), rgba(12, 16, 23, 0.96));
@@ -310,21 +311,21 @@ button {
 
 .song-card img {
   width: 100%;
-  height: 148px;
+  height: 122px;
   object-fit: cover;
 }
 
 .song-card-content {
-  padding: 11px;
+  padding: 9px;
 }
 
 .song-card-content h4 {
-  font-size: 1.02rem;
+  font-size: 0.95rem;
 }
 
 .song-artist-row {
-  margin-top: 8px;
-  padding: 8px;
+  margin-top: 6px;
+  padding: 6px;
   border-radius: 8px;
   display: flex;
   justify-content: space-between;
@@ -348,7 +349,7 @@ button {
 }
 
 .song-stats-row {
-  margin-top: 8px;
+  margin-top: 6px;
   color: var(--muted);
   font-size: 0.78rem;
   display: grid;
@@ -357,20 +358,21 @@ button {
 }
 
 .song-actions {
-  margin-top: 10px;
+  margin-top: 8px;
   display: flex;
   gap: 8px;
 }
 
 .icon-btn {
-  min-width: 44px;
-  min-height: 38px;
+  min-width: 38px;
+  min-height: 34px;
   border: 1px solid var(--stroke);
   border-radius: 999px;
-  background: #141a22;
+  background: linear-gradient(180deg, #1b212a, #141922);
   color: var(--text);
   cursor: pointer;
-  font-weight: 700;
+  font-weight: 800;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
 }
 
 .song-actions .primary {
@@ -402,22 +404,22 @@ button {
 .artist-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 12px;
+  gap: 10px;
 }
 
 .artist-card {
-  border-radius: 12px;
+  border-radius: 10px;
   border: 1px solid var(--stroke);
   background: rgba(17, 22, 29, 0.95);
-  padding: 10px;
+  padding: 8px;
   display: grid;
-  gap: 6px;
+  gap: 5px;
 }
 
 .artist-card img {
   width: 100%;
-  height: 170px;
-  border-radius: 10px;
+  height: 148px;
+  border-radius: 8px;
   object-fit: cover;
 }
 
@@ -449,10 +451,10 @@ button {
   width: min(760px, 100%);
   max-height: 92vh;
   overflow: auto;
-  border-radius: 16px;
+  border-radius: 12px;
   border: 1px solid var(--stroke);
   background: #10151d;
-  padding: 14px;
+  padding: 10px;
 }
 
 .close-btn {
@@ -530,10 +532,10 @@ button {
   bottom: 0;
   z-index: 30;
   border-top: 1px solid var(--stroke);
-  padding: 10px;
+  padding: 7px 8px;
   display: grid;
   grid-template-columns: 1fr;
-  gap: 8px;
+  gap: 6px;
 }
 
 .now-playing {
@@ -543,8 +545,8 @@ button {
 }
 
 .now-playing img {
-  width: 50px;
-  height: 50px;
+  width: 42px;
+  height: 42px;
   object-fit: cover;
   border-radius: 10px;
   background: #111720;
@@ -552,12 +554,12 @@ button {
 
 .now-playing p {
   color: var(--muted);
-  font-size: 0.83rem;
+  font-size: 0.75rem;
 }
 
 .player-controls {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .control-row {
@@ -567,10 +569,10 @@ button {
 }
 
 .control-row .icon-btn {
-  width: 42px;
-  height: 42px;
-  min-width: 42px;
-  min-height: 42px;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
   padding: 0;
 }
 
@@ -588,7 +590,7 @@ button {
   display: grid;
   grid-template-columns: 42px 1fr 42px;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   color: var(--muted);
   font-size: 0.78rem;
 }
@@ -663,9 +665,9 @@ button {
 
 @media (max-width: 620px) {
   .youtube-mini {
-    width: 88px;
-    height: 50px;
-    bottom: 116px;
-    right: 10px;
+    width: 2px;
+    height: 2px;
+    bottom: 90px;
+    right: 4px;
   }
 }
