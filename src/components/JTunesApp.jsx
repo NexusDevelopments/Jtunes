@@ -13,6 +13,18 @@ function formatTime(seconds) {
   return `${mins}:${secs}`;
 }
 
+function appendUnique(prev, nextItems) {
+  const seen = new Set(prev.map((item) => item.id));
+  const merged = [...prev];
+  for (const item of nextItems) {
+    if (!seen.has(item.id)) {
+      merged.push(item);
+      seen.add(item.id);
+    }
+  }
+  return merged;
+}
+
 export default function JTunesApp() {
   const audioRef = useRef(null);
 
@@ -21,6 +33,12 @@ export default function JTunesApp() {
   const [activeView, setActiveView] = useState("discover");
   const [activeGenre, setActiveGenre] = useState("");
   const [search, setSearch] = useState("");
+  const [genreOptions, setGenreOptions] = useState([]);
+
+  const [totalTracks, setTotalTracks] = useState(0);
+  const [totalArtists, setTotalArtists] = useState(0);
+  const [trackOffset, setTrackOffset] = useState(0);
+  const [artistOffset, setArtistOffset] = useState(0);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -34,30 +52,41 @@ export default function JTunesApp() {
   useEffect(() => {
     async function boot() {
       const [tracksRes, artistsRes] = await Promise.all([
-        fetch("/api/tracks", { cache: "no-store" }),
-        fetch("/api/artists", { cache: "no-store" }),
+        fetch("/api/tracks?limit=60&offset=0", { cache: "no-store" }),
+        fetch("/api/artists?limit=30&offset=0", { cache: "no-store" }),
       ]);
 
       const tracksData = await tracksRes.json();
       const artistsData = await artistsRes.json();
 
-      setTracks(tracksData.items ?? []);
-      setArtists(artistsData.items ?? []);
-      if (tracksData.items?.length) {
-        setActiveGenre(tracksData.items[0].genre);
+      const trackItems = tracksData.items ?? [];
+      const artistItems = artistsData.items ?? [];
+
+      setTracks(trackItems);
+      setArtists(artistItems);
+      setTotalTracks(tracksData.total ?? trackItems.length);
+      setTotalArtists(artistsData.total ?? artistItems.length);
+      setTrackOffset(trackItems.length);
+      setArtistOffset(artistItems.length);
+
+      const nextGenres = tracksData.genres?.length
+        ? tracksData.genres
+        : [...new Set(trackItems.map((track) => track.genre))];
+      setGenreOptions(nextGenres);
+
+      if (trackItems.length) {
+        setActiveGenre(trackItems[0].genre);
       }
     }
 
     boot();
   }, []);
 
-  const genres = useMemo(() => [...new Set(tracks.map((track) => track.genre))], [tracks]);
-
   useEffect(() => {
-    if (!activeGenre && genres.length) {
-      setActiveGenre(genres[0]);
+    if (!activeGenre && genreOptions.length) {
+      setActiveGenre(genreOptions[0]);
     }
-  }, [genres, activeGenre]);
+  }, [activeGenre, genreOptions]);
 
   const searchedTracks = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -119,6 +148,28 @@ export default function JTunesApp() {
     };
   });
 
+  async function loadMoreTracks() {
+    const response = await fetch(`/api/tracks?limit=30&offset=${trackOffset}`, {
+      cache: "no-store",
+    });
+    const data = await response.json();
+    const items = data.items ?? [];
+
+    setTracks((prev) => appendUnique(prev, items));
+    setTrackOffset((prev) => prev + items.length);
+  }
+
+  async function loadMoreArtists() {
+    const response = await fetch(`/api/artists?limit=30&offset=${artistOffset}`, {
+      cache: "no-store",
+    });
+    const data = await response.json();
+    const items = data.items ?? [];
+
+    setArtists((prev) => appendUnique(prev, items));
+    setArtistOffset((prev) => prev + items.length);
+  }
+
   function playTrackById(trackId) {
     const index = tracks.findIndex((track) => track.id === trackId);
     if (index < 0) return;
@@ -178,15 +229,15 @@ export default function JTunesApp() {
   const viewMeta = {
     discover: {
       title: "Discover Tracks",
-      subtitle: "Full tracks, bold drops, nonstop flow.",
+      subtitle: "Rap-heavy catalog with full-track streaming.",
     },
     genres: {
       title: "Genre Pages",
-      subtitle: "Browse tracks by style and find new sounds.",
+      subtitle: "Mostly rap genres, from Trap to Drill to Boom Bap.",
     },
     artists: {
       title: "Artist Pages",
-      subtitle: "See profile, listeners, followers, albums, and songs.",
+      subtitle: "Profiles, listeners, followers, albums, and songs.",
     },
   };
 
@@ -201,7 +252,7 @@ export default function JTunesApp() {
             <div className="brand-logo">J</div>
             <div>
               <h1>J Tunes</h1>
-              <p>Wave Engine</p>
+              <p>Mobile Rap Wave</p>
             </div>
           </div>
 
@@ -219,16 +270,16 @@ export default function JTunesApp() {
 
           <div className="stats-grid">
             <article>
-              <h4>{formatCompact(1500000)}</h4>
+              <h4>{formatCompact(totalTracks || tracks.length)}</h4>
               <p>Tracks Live</p>
             </article>
             <article>
-              <h4>{artists.length}</h4>
-              <p>Rappers</p>
+              <h4>{formatCompact(totalArtists || artists.length)}</h4>
+              <p>Artists Live</p>
             </article>
             <article>
-              <h4>{genres.length}</h4>
-              <p>Genres</p>
+              <h4>{genreOptions.length}</h4>
+              <p>Rap Genres</p>
             </article>
           </div>
         </aside>
@@ -259,6 +310,7 @@ export default function JTunesApp() {
                 {artists
                   .slice()
                   .sort((a, b) => b.monthlyListeners - a.monthlyListeners)
+                  .slice(0, 16)
                   .map((artist) => (
                     <button
                       key={artist.id}
@@ -276,6 +328,9 @@ export default function JTunesApp() {
 
               <div className="section-title">
                 <h3>Song Library</h3>
+                <button className="load-btn" onClick={loadMoreTracks}>
+                  Load More
+                </button>
               </div>
               <div className="song-grid">
                 {searchedTracks.map((track) => (
@@ -283,19 +338,32 @@ export default function JTunesApp() {
                     <img src={track.cover} alt={track.title} />
                     <div className="song-card-content">
                       <h4>{track.title}</h4>
-                      <div className="song-meta">
-                        <span>{track.artist?.name}</span>
-                        <span>{track.duration}</span>
+                      <div className="song-artist-row">
+                        <span>Artist</span>
+                        <button onClick={() => setSelectedArtist(track.artist)}>{track.artist?.name}</button>
                       </div>
-                      <div className="song-meta">
+                      <div className="song-stats-row">
                         <span>{track.genre}</span>
+                        <span>{track.duration}</span>
                         <span>{formatCompact(track.plays)} plays</span>
                       </div>
                       <div className="song-actions">
-                        <button className="primary" onClick={() => playTrackById(track.id)}>
-                          Play
+                        <button
+                          className="primary icon-btn"
+                          aria-label="Play track"
+                          title="Play"
+                          onClick={() => playTrackById(track.id)}
+                        >
+                          &gt;
                         </button>
-                        <button onClick={() => setSelectedArtist(track.artist)}>Artist</button>
+                        <button
+                          className="icon-btn"
+                          aria-label="Open artist"
+                          title="Artist"
+                          onClick={() => setSelectedArtist(track.artist)}
+                        >
+                          @
+                        </button>
                       </div>
                     </div>
                   </article>
@@ -309,7 +377,7 @@ export default function JTunesApp() {
               <div className="section-title">
                 <h3>Genre Pages</h3>
                 <div className="genre-tabs">
-                  {genres.map((genre) => (
+                  {genreOptions.map((genre) => (
                     <button
                       key={genre}
                       className={`genre-tab ${activeGenre === genre ? "active" : ""}`}
@@ -326,15 +394,32 @@ export default function JTunesApp() {
                     <img src={track.cover} alt={track.title} />
                     <div className="song-card-content">
                       <h4>{track.title}</h4>
-                      <div className="song-meta">
-                        <span>{track.artist?.name}</span>
+                      <div className="song-artist-row">
+                        <span>Artist</span>
+                        <button onClick={() => setSelectedArtist(track.artist)}>{track.artist?.name}</button>
+                      </div>
+                      <div className="song-stats-row">
+                        <span>{track.genre}</span>
                         <span>{track.duration}</span>
+                        <span>{formatCompact(track.plays)} plays</span>
                       </div>
                       <div className="song-actions">
-                        <button className="primary" onClick={() => playTrackById(track.id)}>
-                          Play
+                        <button
+                          className="primary icon-btn"
+                          aria-label="Play track"
+                          title="Play"
+                          onClick={() => playTrackById(track.id)}
+                        >
+                          &gt;
                         </button>
-                        <button onClick={() => setSelectedArtist(track.artist)}>Artist</button>
+                        <button
+                          className="icon-btn"
+                          aria-label="Open artist"
+                          title="Artist"
+                          onClick={() => setSelectedArtist(track.artist)}
+                        >
+                          @
+                        </button>
                       </div>
                     </div>
                   </article>
@@ -347,6 +432,9 @@ export default function JTunesApp() {
             <section className="panel glass">
               <div className="section-title">
                 <h3>Artist Pages</h3>
+                <button className="load-btn" onClick={loadMoreArtists}>
+                  Load More
+                </button>
               </div>
               <div className="artist-grid">
                 {artists.map((artist) => (
@@ -355,7 +443,7 @@ export default function JTunesApp() {
                     <h4>{artist.name}</h4>
                     <p>{formatCompact(artist.monthlyListeners)} monthly listeners</p>
                     <p>{formatCompact(artist.followers)} followers</p>
-                    <button onClick={() => setSelectedArtist(artist)}>Open Artist Page</button>
+                    <button onClick={() => setSelectedArtist(artist)}>Open Artist</button>
                   </article>
                 ))}
               </div>
@@ -368,7 +456,7 @@ export default function JTunesApp() {
         <section className="artist-modal" onClick={() => setSelectedArtist(null)}>
           <div className="artist-modal-inner" onClick={(event) => event.stopPropagation()}>
             <button className="close-btn" onClick={() => setSelectedArtist(null)}>
-              Close
+              X
             </button>
             <div className="artist-head">
               <img src={selectedArtist.pfp} alt={selectedArtist.name} />
@@ -385,7 +473,7 @@ export default function JTunesApp() {
               <div>
                 <h4>Albums</h4>
                 <ul>
-                  {selectedArtist.albums.map((album) => (
+                  {(selectedArtist.albums ?? ["Street Season", "Rap Motion", "Night Stories"]).map((album) => (
                     <li key={album}>{album}</li>
                   ))}
                 </ul>
@@ -395,10 +483,11 @@ export default function JTunesApp() {
                 <ul>
                   {tracks
                     .filter((track) => track.artistId === selectedArtist.id)
+                    .slice(0, 12)
                     .map((track) => (
                       <li key={track.id}>
                         <span>{track.title}</span>
-                        <button onClick={() => playTrackById(track.id)}>Play</button>
+                        <button onClick={() => playTrackById(track.id)}>&gt;</button>
                       </li>
                     ))}
                 </ul>
@@ -419,12 +508,28 @@ export default function JTunesApp() {
 
         <div className="player-controls">
           <div className="control-row">
-            <button onClick={handlePrev}>Back</button>
-            <button className="play-main" onClick={togglePlay}>
-              {isPlaying ? "Pause" : "Play"}
+            <button className="icon-btn" aria-label="Previous track" title="Previous" onClick={handlePrev}>
+              &lt;&lt;
             </button>
-            <button onClick={handleNext}>Next</button>
-            <button onClick={toggleLoop}>{loop ? "Loop On" : "Loop Off"}</button>
+            <button
+              className="play-main icon-btn"
+              aria-label={isPlaying ? "Pause" : "Play"}
+              title={isPlaying ? "Pause" : "Play"}
+              onClick={togglePlay}
+            >
+              {isPlaying ? "||" : ">"}
+            </button>
+            <button className="icon-btn" aria-label="Next track" title="Next" onClick={handleNext}>
+              &gt;&gt;
+            </button>
+            <button
+              className={`icon-btn ${loop ? "loop-on" : ""}`}
+              aria-label={loop ? "Loop on" : "Loop off"}
+              title={loop ? "Loop on" : "Loop off"}
+              onClick={toggleLoop}
+            >
+              O
+            </button>
           </div>
 
           <div className="seek-row">

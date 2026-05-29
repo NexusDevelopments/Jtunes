@@ -127,3 +127,90 @@ export const tracks = [
 export const artistById = Object.fromEntries(artists.map((artist) => [artist.id, artist]));
 
 export const genres = [...new Set(tracks.map((track) => track.genre))];
+
+export const VIRTUAL_ARTIST_COUNT = 2_000_000;
+export const VIRTUAL_TRACK_COUNT = 12_000_000;
+
+const RAP_GENRES = [
+  "Rap",
+  "Hip-Hop",
+  "Trap",
+  "Drill",
+  "Boom Bap",
+  "Conscious Rap",
+  "Cloud Rap",
+  "Pop Rap",
+  "Underground Rap",
+  "West Coast Rap",
+];
+
+const RAP_WORD_A = ["Street", "Neon", "Crown", "Ghost", "Vault", "Cipher", "Concrete", "Velocity"];
+const RAP_WORD_B = ["Kings", "Verse", "District", "Pulse", "Anthem", "Storm", "Empire", "Mode"];
+const RAP_WORD_C = ["Flow", "Night", "Rhythm", "Code", "Legacy", "Shift", "Signal", "Rise"];
+
+const audioPool = tracks.map((track) => track.src);
+const coverPool = tracks.map((track) => track.cover);
+
+function pick(list, index) {
+  return list[Math.abs(index) % list.length];
+}
+
+function toVirtualArtistId(index) {
+  return `va-${index}`;
+}
+
+function toVirtualTrackId(index) {
+  return `vt-${index}`;
+}
+
+export function parseVirtualArtistId(id) {
+  const match = /^va-(\d+)$/.exec(id ?? "");
+  return match ? Number(match[1]) : null;
+}
+
+export function parseVirtualTrackId(id) {
+  const match = /^vt-(\d+)$/.exec(id ?? "");
+  return match ? Number(match[1]) : null;
+}
+
+export function makeVirtualArtist(index) {
+  const normalized = Math.abs(index) % VIRTUAL_ARTIST_COUNT;
+  const monthlyListeners = 150_000 + ((normalized * 37_919) % 29_000_000);
+  const followers = 40_000 + ((normalized * 17_113) % 14_000_000);
+
+  return {
+    id: toVirtualArtistId(normalized),
+    name: `${pick(RAP_WORD_A, normalized)} ${pick(RAP_WORD_B, normalized + 3)}`,
+    pfp: `https://api.dicebear.com/9.x/adventurer/svg?seed=jtunes-artist-${normalized}`,
+    monthlyListeners,
+    followers,
+    albums: [
+      `${pick(RAP_WORD_A, normalized)} ${pick(RAP_WORD_C, normalized + 1)}`,
+      `${pick(RAP_WORD_B, normalized + 2)} ${pick(RAP_WORD_C, normalized + 3)}`,
+      `${pick(RAP_WORD_A, normalized + 4)} ${pick(RAP_WORD_B, normalized + 5)}`,
+    ],
+    isVirtual: true,
+  };
+}
+
+export function makeVirtualTrack(index) {
+  const normalized = Math.abs(index) % VIRTUAL_TRACK_COUNT;
+  const artistIndex = normalized % VIRTUAL_ARTIST_COUNT;
+  const mins = 2 + (normalized % 5);
+  const secs = String((normalized * 13) % 60).padStart(2, "0");
+
+  return {
+    id: toVirtualTrackId(normalized),
+    title: `${pick(RAP_WORD_A, normalized)} ${pick(RAP_WORD_B, normalized + 1)} ${pick(RAP_WORD_C, normalized + 2)}`,
+    artistId: toVirtualArtistId(artistIndex),
+    genre: pick(RAP_GENRES, normalized),
+    duration: `${mins}:${secs}`,
+    cover: pick(coverPool, normalized),
+    src: pick(audioPool, normalized),
+    releasedAt: `202${normalized % 6}-0${(normalized % 9) + 1}-1${normalized % 9}`,
+    plays: 50_000 + ((normalized * 46_337) % 60_000_000),
+    isVirtual: true,
+  };
+}
+
+export const RAP_VIRTUAL_GENRES = RAP_GENRES;

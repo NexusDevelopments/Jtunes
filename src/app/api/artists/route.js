@@ -1,8 +1,19 @@
 import { NextResponse } from "next/server";
 import { getArtistList } from "@/lib/api";
 
-export function GET() {
-  const result = getArtistList();
+export function GET(request) {
+  const query = Object.fromEntries(request.nextUrl.searchParams.entries());
+  const result = getArtistList(query);
+
+  if (!result.ok) {
+    return NextResponse.json(
+      {
+        error: result.error,
+        details: result.details ?? null,
+      },
+      { status: result.status },
+    );
+  }
 
   return NextResponse.json(result.data, {
     status: 200,
