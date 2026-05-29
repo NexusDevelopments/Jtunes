@@ -1,216 +1,350 @@
 export const artists = [
   {
-    id: "nova-k",
-    name: "Nova K",
-    pfp: "https://images.unsplash.com/photo-1511367461989-f85a21fda167?auto=format&fit=crop&w=900&q=80",
-    monthlyListeners: 12300000,
-    followers: 8400000,
-    albums: ["Skyline Season", "Static Crown", "After Midnight"],
+    id: "drake",
+    name: "Drake",
+    pfp: "https://ui-avatars.com/api/?name=Drake&background=0b1220&color=60a5fa&size=256",
+    monthlyListeners: 74600000,
+    followers: 52000000,
+    albums: ["Take Care", "Views", "For All The Dogs"],
   },
   {
-    id: "ray-volt",
-    name: "Ray Volt",
-    pfp: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=900&q=80",
-    monthlyListeners: 9800000,
-    followers: 7100000,
-    albums: ["No Sleep District", "Blue Fire", "Shadow Tape"],
+    id: "kendrick-lamar",
+    name: "Kendrick Lamar",
+    pfp: "https://ui-avatars.com/api/?name=Kendrick+Lamar&background=0b1220&color=60a5fa&size=256",
+    monthlyListeners: 64300000,
+    followers: 34000000,
+    albums: ["good kid, m.A.A.d city", "DAMN.", "Mr. Morale & the Big Steppers"],
   },
   {
-    id: "echo-rio",
-    name: "Echo Rio",
-    pfp: "https://images.unsplash.com/photo-1521119989659-a83eee488004?auto=format&fit=crop&w=900&q=80",
-    monthlyListeners: 15200000,
-    followers: 10200000,
-    albums: ["Neon Ghost", "Riot Dreams", "Fast Lane Poetry"],
+    id: "eminem",
+    name: "Eminem",
+    pfp: "https://ui-avatars.com/api/?name=Eminem&background=0b1220&color=60a5fa&size=256",
+    monthlyListeners: 80000000,
+    followers: 70000000,
+    albums: ["The Marshall Mathers LP", "The Eminem Show", "Recovery"],
   },
   {
-    id: "zay-rush",
-    name: "Zay Rush",
-    pfp: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=80",
-    monthlyListeners: 7600000,
-    followers: 4900000,
-    albums: ["Concrete Lights", "Rush Hour", "Cold Summer"],
+    id: "travis-scott",
+    name: "Travis Scott",
+    pfp: "https://ui-avatars.com/api/?name=Travis+Scott&background=0b1220&color=60a5fa&size=256",
+    monthlyListeners: 72000000,
+    followers: 29000000,
+    albums: ["Rodeo", "ASTROWORLD", "UTOPIA"],
+  },
+  {
+    id: "j-cole",
+    name: "J. Cole",
+    pfp: "https://ui-avatars.com/api/?name=J+Cole&background=0b1220&color=60a5fa&size=256",
+    monthlyListeners: 50200000,
+    followers: 28000000,
+    albums: ["2014 Forest Hills Drive", "KOD", "The Off-Season"],
+  },
+  {
+    id: "future",
+    name: "Future",
+    pfp: "https://ui-avatars.com/api/?name=Future&background=0b1220&color=60a5fa&size=256",
+    monthlyListeners: 61000000,
+    followers: 25000000,
+    albums: ["DS2", "HNDRXX", "I NEVER LIKED YOU"],
+  },
+  {
+    id: "21-savage",
+    name: "21 Savage",
+    pfp: "https://ui-avatars.com/api/?name=21+Savage&background=0b1220&color=60a5fa&size=256",
+    monthlyListeners: 57400000,
+    followers: 22000000,
+    albums: ["I Am > I Was", "Savage Mode II", "american dream"],
+  },
+  {
+    id: "nicki-minaj",
+    name: "Nicki Minaj",
+    pfp: "https://ui-avatars.com/api/?name=Nicki+Minaj&background=0b1220&color=60a5fa&size=256",
+    monthlyListeners: 48000000,
+    followers: 32000000,
+    albums: ["Pink Friday", "The Pinkprint", "Pink Friday 2"],
+  },
+  {
+    id: "lil-wayne",
+    name: "Lil Wayne",
+    pfp: "https://ui-avatars.com/api/?name=Lil+Wayne&background=0b1220&color=60a5fa&size=256",
+    monthlyListeners: 43000000,
+    followers: 26000000,
+    albums: ["Tha Carter III", "Tha Carter IV", "Tha Carter V"],
+  },
+  {
+    id: "50-cent",
+    name: "50 Cent",
+    pfp: "https://ui-avatars.com/api/?name=50+Cent&background=0b1220&color=60a5fa&size=256",
+    monthlyListeners: 38000000,
+    followers: 19000000,
+    albums: ["Get Rich or Die Tryin'", "The Massacre", "Curtis"],
+  },
+  {
+    id: "snoop-dogg",
+    name: "Snoop Dogg",
+    pfp: "https://ui-avatars.com/api/?name=Snoop+Dogg&background=0b1220&color=60a5fa&size=256",
+    monthlyListeners: 35000000,
+    followers: 18000000,
+    albums: ["Doggystyle", "Tha Doggfather", "R&G"],
+  },
+  {
+    id: "cardi-b",
+    name: "Cardi B",
+    pfp: "https://ui-avatars.com/api/?name=Cardi+B&background=0b1220&color=60a5fa&size=256",
+    monthlyListeners: 30000000,
+    followers: 24000000,
+    albums: ["Invasion of Privacy", "Gangsta Bitch Music Vol. 1", "Am I the Drama?"],
   },
 ];
 
 export const tracks = [
   {
     id: "t1",
-    title: "City Pulse",
-    artistId: "nova-k",
+    title: "HUMBLE.",
+    artistId: "kendrick-lamar",
     genre: "Hip-Hop",
-    duration: "6:13",
-    cover: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1200&q=80",
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-    releasedAt: "2024-09-21",
-    plays: 9123000,
+    duration: "2:57",
+    cover: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1200&q=80",
+    youtubeId: "tvTRZJ-4EyI",
+    plays: 1380000000,
   },
   {
     id: "t2",
-    title: "Blue Flame Cipher",
-    artistId: "ray-volt",
-    genre: "Trap",
-    duration: "5:31",
-    cover: "https://images.unsplash.com/photo-1494232410401-ad00d5433cfa?auto=format&fit=crop&w=1200&q=80",
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
-    releasedAt: "2024-08-12",
-    plays: 6642000,
+    title: "DNA.",
+    artistId: "kendrick-lamar",
+    genre: "Rap",
+    duration: "3:06",
+    cover: "https://images.unsplash.com/photo-1470229538611-16ba8c7ffbd7?auto=format&fit=crop&w=1200&q=80",
+    youtubeId: "NLZRYQMLDW4",
+    plays: 760000000,
   },
   {
     id: "t3",
-    title: "Midnight Drip",
-    artistId: "echo-rio",
-    genre: "Drill",
-    duration: "5:03",
-    cover: "https://images.unsplash.com/photo-1470229538611-16ba8c7ffbd7?auto=format&fit=crop&w=1200&q=80",
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
-    releasedAt: "2025-01-10",
-    plays: 10500000,
+    title: "God's Plan",
+    artistId: "drake",
+    genre: "Pop Rap",
+    duration: "3:18",
+    cover: "https://images.unsplash.com/photo-1494232410401-ad00d5433cfa?auto=format&fit=crop&w=1200&q=80",
+    youtubeId: "xpVfcZ0ZcFM",
+    plays: 1700000000,
   },
   {
     id: "t4",
-    title: "Chrome Dreams",
-    artistId: "zay-rush",
-    genre: "Rap",
-    duration: "4:37",
+    title: "Hotline Bling",
+    artistId: "drake",
+    genre: "Hip-Hop",
+    duration: "4:28",
     cover: "https://images.unsplash.com/photo-1506157786151-b8491531f063?auto=format&fit=crop&w=1200&q=80",
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
-    releasedAt: "2023-12-03",
-    plays: 5420000,
+    youtubeId: "uxpDa-c-4Mc",
+    plays: 2200000000,
   },
   {
     id: "t5",
-    title: "Night Shift Anthem",
-    artistId: "nova-k",
-    genre: "Pop Rap",
-    duration: "6:11",
+    title: "SICKO MODE",
+    artistId: "travis-scott",
+    genre: "Trap",
+    duration: "5:13",
     cover: "https://images.unsplash.com/photo-1461784180009-21121b2f204c?auto=format&fit=crop&w=1200&q=80",
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
-    releasedAt: "2025-03-14",
-    plays: 7345000,
+    youtubeId: "6ONRf7h3Mdk",
+    plays: 1100000000,
   },
   {
     id: "t6",
-    title: "Cashline",
-    artistId: "ray-volt",
+    title: "goosebumps",
+    artistId: "travis-scott",
     genre: "Trap",
-    duration: "5:26",
+    duration: "4:03",
     cover: "https://images.unsplash.com/photo-1487180144351-b8472da7d491?auto=format&fit=crop&w=1200&q=80",
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3",
-    releasedAt: "2024-06-07",
-    plays: 6120000,
+    youtubeId: "Dst9gZkq1a8",
+    plays: 920000000,
   },
   {
     id: "t7",
-    title: "No Brakes",
-    artistId: "echo-rio",
-    genre: "Hip-Hop",
-    duration: "4:59",
+    title: "Without Me",
+    artistId: "eminem",
+    genre: "Rap",
+    duration: "4:50",
     cover: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80",
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3",
-    releasedAt: "2024-11-29",
-    plays: 8901000,
+    youtubeId: "YVkUvmDQ3HY",
+    plays: 1900000000,
   },
   {
     id: "t8",
-    title: "Violet Exit",
-    artistId: "zay-rush",
-    genre: "Drill",
-    duration: "7:08",
+    title: "Not Afraid",
+    artistId: "eminem",
+    genre: "Rap",
+    duration: "4:08",
     cover: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1200&q=80",
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
-    releasedAt: "2025-04-23",
-    plays: 4789000,
-  }
+    youtubeId: "j5-yKhDd64s",
+    plays: 1900000000,
+  },
+  {
+    id: "t9",
+    title: "No Role Modelz",
+    artistId: "j-cole",
+    genre: "Conscious Rap",
+    duration: "4:52",
+    cover: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1200&q=80",
+    youtubeId: "RF0HhrwIwp0",
+    plays: 890000000,
+  },
+  {
+    id: "t10",
+    title: "MIDDLE CHILD",
+    artistId: "j-cole",
+    genre: "Hip-Hop",
+    duration: "3:34",
+    cover: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=1200&q=80",
+    youtubeId: "WILNIXZr2oc",
+    plays: 360000000,
+  },
+  {
+    id: "t11",
+    title: "Mask Off",
+    artistId: "future",
+    genre: "Trap",
+    duration: "3:24",
+    cover: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=1200&q=80",
+    youtubeId: "xvZqHgFz51I",
+    plays: 680000000,
+  },
+  {
+    id: "t12",
+    title: "Life Is Good",
+    artistId: "future",
+    genre: "Trap",
+    duration: "5:35",
+    cover: "https://images.unsplash.com/photo-1571266028243-1a9d58ef4506?auto=format&fit=crop&w=1200&q=80",
+    youtubeId: "l0U7SxXHkPY",
+    plays: 1300000000,
+  },
+  {
+    id: "t13",
+    title: "a lot",
+    artistId: "21-savage",
+    genre: "Trap",
+    duration: "4:48",
+    cover: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80",
+    youtubeId: "DmWWqogr_r8",
+    plays: 420000000,
+  },
+  {
+    id: "t14",
+    title: "Bank Account",
+    artistId: "21-savage",
+    genre: "Trap",
+    duration: "3:41",
+    cover: "https://images.unsplash.com/photo-1516280030429-27679b3dc9cf?auto=format&fit=crop&w=1200&q=80",
+    youtubeId: "sV2t3tW_JTQ",
+    plays: 530000000,
+  },
+  {
+    id: "t15",
+    title: "Super Bass",
+    artistId: "nicki-minaj",
+    genre: "Pop Rap",
+    duration: "3:20",
+    cover: "https://images.unsplash.com/photo-1499415479124-43c32433a620?auto=format&fit=crop&w=1200&q=80",
+    youtubeId: "4JipHEz53sU",
+    plays: 1000000000,
+  },
+  {
+    id: "t16",
+    title: "Anaconda",
+    artistId: "nicki-minaj",
+    genre: "Rap",
+    duration: "4:20",
+    cover: "https://images.unsplash.com/photo-1485579149621-3123dd979885?auto=format&fit=crop&w=1200&q=80",
+    youtubeId: "LDZX4ooRsWs",
+    plays: 1200000000,
+  },
+  {
+    id: "t17",
+    title: "A Milli",
+    artistId: "lil-wayne",
+    genre: "Rap",
+    duration: "3:41",
+    cover: "https://images.unsplash.com/photo-1521335629791-ce4aec67dd47?auto=format&fit=crop&w=1200&q=80",
+    youtubeId: "1Vf4mMCpNY0",
+    plays: 190000000,
+  },
+  {
+    id: "t18",
+    title: "Lollipop",
+    artistId: "lil-wayne",
+    genre: "Rap",
+    duration: "4:59",
+    cover: "https://images.unsplash.com/photo-1518972559570-7cc1309f3229?auto=format&fit=crop&w=1200&q=80",
+    youtubeId: "2IH8tNQAzSs",
+    plays: 630000000,
+  },
+  {
+    id: "t19",
+    title: "In Da Club",
+    artistId: "50-cent",
+    genre: "Hip-Hop",
+    duration: "3:45",
+    cover: "https://images.unsplash.com/photo-1501612780327-45045538702b?auto=format&fit=crop&w=1200&q=80",
+    youtubeId: "5qm8PH4xAss",
+    plays: 1800000000,
+  },
+  {
+    id: "t20",
+    title: "Candy Shop",
+    artistId: "50-cent",
+    genre: "Hip-Hop",
+    duration: "3:29",
+    cover: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=1200&q=80",
+    youtubeId: "SRcnnId15BA",
+    plays: 980000000,
+  },
+  {
+    id: "t21",
+    title: "Still D.R.E.",
+    artistId: "snoop-dogg",
+    genre: "West Coast Rap",
+    duration: "4:34",
+    cover: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80",
+    youtubeId: "_CL6n0FJZpk",
+    plays: 1400000000,
+  },
+  {
+    id: "t22",
+    title: "Drop It Like It's Hot",
+    artistId: "snoop-dogg",
+    genre: "West Coast Rap",
+    duration: "4:26",
+    cover: "https://images.unsplash.com/photo-1464375117522-1311dd7d4445?auto=format&fit=crop&w=1200&q=80",
+    youtubeId: "GtUVQei3nX4",
+    plays: 300000000,
+  },
+  {
+    id: "t23",
+    title: "Bodak Yellow",
+    artistId: "cardi-b",
+    genre: "Trap",
+    duration: "3:43",
+    cover: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1200&q=80",
+    youtubeId: "PEGccV-NOm8",
+    plays: 1200000000,
+  },
+  {
+    id: "t24",
+    title: "WAP",
+    artistId: "cardi-b",
+    genre: "Rap",
+    duration: "3:12",
+    cover: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1200&q=80",
+    youtubeId: "hsm4poTWjMs",
+    plays: 520000000,
+  },
 ];
 
 export const artistById = Object.fromEntries(artists.map((artist) => [artist.id, artist]));
 
 export const genres = [...new Set(tracks.map((track) => track.genre))];
 
-export const VIRTUAL_ARTIST_COUNT = 2_000_000;
-export const VIRTUAL_TRACK_COUNT = 12_000_000;
-
-const RAP_GENRES = [
-  "Rap",
-  "Hip-Hop",
-  "Trap",
-  "Drill",
-  "Boom Bap",
-  "Conscious Rap",
-  "Cloud Rap",
-  "Pop Rap",
-  "Underground Rap",
-  "West Coast Rap",
-];
-
-const RAP_WORD_A = ["Street", "Neon", "Crown", "Ghost", "Vault", "Cipher", "Concrete", "Velocity"];
-const RAP_WORD_B = ["Kings", "Verse", "District", "Pulse", "Anthem", "Storm", "Empire", "Mode"];
-const RAP_WORD_C = ["Flow", "Night", "Rhythm", "Code", "Legacy", "Shift", "Signal", "Rise"];
-
-const audioPool = tracks.map((track) => track.src);
-const coverPool = tracks.map((track) => track.cover);
-
-function pick(list, index) {
-  return list[Math.abs(index) % list.length];
-}
-
-function toVirtualArtistId(index) {
-  return `va-${index}`;
-}
-
-function toVirtualTrackId(index) {
-  return `vt-${index}`;
-}
-
-export function parseVirtualArtistId(id) {
-  const match = /^va-(\d+)$/.exec(id ?? "");
-  return match ? Number(match[1]) : null;
-}
-
-export function parseVirtualTrackId(id) {
-  const match = /^vt-(\d+)$/.exec(id ?? "");
-  return match ? Number(match[1]) : null;
-}
-
-export function makeVirtualArtist(index) {
-  const normalized = Math.abs(index) % VIRTUAL_ARTIST_COUNT;
-  const monthlyListeners = 150_000 + ((normalized * 37_919) % 29_000_000);
-  const followers = 40_000 + ((normalized * 17_113) % 14_000_000);
-
-  return {
-    id: toVirtualArtistId(normalized),
-    name: `${pick(RAP_WORD_A, normalized)} ${pick(RAP_WORD_B, normalized + 3)}`,
-    pfp: `https://api.dicebear.com/9.x/adventurer/svg?seed=jtunes-artist-${normalized}`,
-    monthlyListeners,
-    followers,
-    albums: [
-      `${pick(RAP_WORD_A, normalized)} ${pick(RAP_WORD_C, normalized + 1)}`,
-      `${pick(RAP_WORD_B, normalized + 2)} ${pick(RAP_WORD_C, normalized + 3)}`,
-      `${pick(RAP_WORD_A, normalized + 4)} ${pick(RAP_WORD_B, normalized + 5)}`,
-    ],
-    isVirtual: true,
-  };
-}
-
-export function makeVirtualTrack(index) {
-  const normalized = Math.abs(index) % VIRTUAL_TRACK_COUNT;
-  const artistIndex = normalized % VIRTUAL_ARTIST_COUNT;
-  const mins = 2 + (normalized % 5);
-  const secs = String((normalized * 13) % 60).padStart(2, "0");
-
-  return {
-    id: toVirtualTrackId(normalized),
-    title: `${pick(RAP_WORD_A, normalized)} ${pick(RAP_WORD_B, normalized + 1)} ${pick(RAP_WORD_C, normalized + 2)}`,
-    artistId: toVirtualArtistId(artistIndex),
-    genre: pick(RAP_GENRES, normalized),
-    duration: `${mins}:${secs}`,
-    cover: pick(coverPool, normalized),
-    src: pick(audioPool, normalized),
-    releasedAt: `202${normalized % 6}-0${(normalized % 9) + 1}-1${normalized % 9}`,
-    plays: 50_000 + ((normalized * 46_337) % 60_000_000),
-    isVirtual: true,
-  };
-}
-
-export const RAP_VIRTUAL_GENRES = RAP_GENRES;
+export const catalogMetrics = {
+  indexedTracks: 110_000_000,
+  indexedArtists: 6_000_000,
+};

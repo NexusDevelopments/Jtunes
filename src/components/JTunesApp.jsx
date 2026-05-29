@@ -26,7 +26,9 @@ function appendUnique(prev, nextItems) {
 }
 
 export default function JTunesApp() {
-  const audioRef = useRef(null);
+  const ytPlayerRef = useRef(null);
+  const ytReadyRef = useRef(false);
+  const progressTimerRef = useRef(null);
 
   const [tracks, setTracks] = useState([]);
   const [artists, setArtists] = useState([]);
@@ -37,6 +39,8 @@ export default function JTunesApp() {
 
   const [totalTracks, setTotalTracks] = useState(0);
   const [totalArtists, setTotalArtists] = useState(0);
+  const [indexedTracks, setIndexedTracks] = useState(0);
+  const [indexedArtists, setIndexedArtists] = useState(0);
   const [trackOffset, setTrackOffset] = useState(0);
   const [artistOffset, setArtistOffset] = useState(0);
 
@@ -48,6 +52,60 @@ export default function JTunesApp() {
   const [duration, setDuration] = useState("0:00");
 
   const [selectedArtist, setSelectedArtist] = useState(null);
+
+  const currentTrack = tracks[currentIndex] ?? null;
+
+  function stopProgressWatcher() {
+    if (progressTimerRef.current) {
+      window.clearInterval(progressTimerRef.current);
+      progressTimerRef.current = null;
+    }
+  }
+
+  function startProgressWatcher() {
+    stopProgressWatcher();
+    progressTimerRef.current = window.setInterval(() => {
+      const player = ytPlayerRef.current;
+      if (!player || !ytReadyRef.current) {
+        return;
+      }
+
+      const seconds = player.getCurrentTime?.() ?? 0;
+      const total = player.getDuration?.() ?? 0;
+
+      setCurrentTime(formatTime(seconds));
+      setDuration(formatTime(total));
+
+      if (total > 0) {
+        setProgress((seconds / total) * 100);
+      }
+    }, 450);
+  }
+
+  function playCurrentTrack(autoplay) {
+    if (!currentTrack || !ytReadyRef.current || !ytPlayerRef.current) {
+      return;
+    }
+
+    if (autoplay) {
+      ytPlayerRef.current.loadVideoById(currentTrack.youtubeId);
+      ytPlayerRef.current.playVideo();
+      setIsPlaying(true);
+    } else {
+      ytPlayerRef.current.cueVideoById(currentTrack.youtubeId);
+      setIsPlaying(false);
+      stopProgressWatcher();
+      setProgress(0);
+      setCurrentTime("0:00");
+      setDuration(currentTrack.duration ?? "0:00");
+    }
+  }
+
+  function handleNext() {
+    if (!tracks.length) return;
+    setCurrentIndex((prev) => (prev + 1) % tracks.length);
+    setIsPlaying(true);
+  }
 
   useEffect(() => {
     async function boot() {
@@ -66,6 +124,8 @@ export default function JTunesApp() {
       setArtists(artistItems);
       setTotalTracks(tracksData.total ?? trackItems.length);
       setTotalArtists(artistsData.total ?? artistItems.length);
+      setIndexedTracks(tracksData.catalogMetrics?.indexedTracks ?? 0);
+      setIndexedArtists(tracksData.catalogMetrics?.indexedArtists ?? 0);
       setTrackOffset(trackItems.length);
       setArtistOffset(artistItems.length);
 
@@ -88,6 +148,94 @@ export default function JTunesApp() {
     }
   }, [activeGenre, genreOptions]);
 
+  useEffect(() => {
+    if (!tracks.length) {
+      return undefined;
+    }
+
+    const installPlayer = () => {
+      if (!window.YT || !window.YT.Player || ytPlayerRef.current) {
+        return;
+      }
+
+      ytPlayerRef.current = new window.YT.Player("yt-player-host", {
+        width: "160",
+        height: "90",
+        videoId: tracks[0].youtubeId,
+        playerVars: {
+          autoplay: 0,
+          controls: 0,
+          disablekb: 1,
+          fs: 0,
+          modestbranding: 1,
+          playsinline: 1,
+          rel: 0,
+        },
+        events: {
+          onReady: () => {
+            ytReadyRef.current = true;
+            setDuration(tracks[0].duration ?? "0:00");
+          },
+          onStateChange: (event) => {
+            if (!window.YT) {
+              return;
+            }
+
+            const state = event.data;
+            if (state === window.YT.PlayerState.PLAYING) {
+              setIsPlaying(true);
+              startProgressWatcher();
+            }
+
+            if (state === window.YT.PlayerState.PAUSED) {
+              setIsPlaying(false);
+              stopProgressWatcher();
+            }
+
+            if (state === window.YT.PlayerState.ENDED) {
+              stopProgressWatcher();
+              if (loop) {
+                ytPlayerRef.current.seekTo(0, true);
+                ytPlayerRef.current.playVideo();
+              } else {
+                handleNext();
+              }
+            }
+          },
+        },
+      });
+    };
+
+    if (window.YT?.Player) {
+      installPlayer();
+    } else {
+      const script = document.createElement("script");
+      script.src = "https://www.youtube.com/iframe_api";
+      script.async = true;
+      document.body.appendChild(script);
+
+      const oldReady = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => {
+        if (typeof oldReady === "function") {
+          oldReady();
+        }
+        installPlayer();
+      };
+    }
+
+    return () => {
+      stopProgressWatcher();
+    };
+  }, [tracks, loop]);
+
+  useEffect(() => {
+    if (!currentTrack || !ytReadyRef.current || !ytPlayerRef.current) {
+      return;
+    }
+
+    playCurrentTrack(isPlaying);
+  }, [currentTrack]);
+
   const searchedTracks = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return tracks;
@@ -105,48 +253,6 @@ export default function JTunesApp() {
     () => tracks.filter((track) => track.genre === activeGenre),
     [tracks, activeGenre],
   );
-
-  const currentTrack = tracks[currentIndex] ?? null;
-
-  useEffect(() => {
-    if (!currentTrack || !audioRef.current) return;
-
-    audioRef.current.src = currentTrack.src;
-    audioRef.current.loop = loop;
-
-    if (isPlaying) {
-      audioRef.current.play().catch(() => {
-        setIsPlaying(false);
-      });
-    }
-  }, [currentTrack, loop, isPlaying]);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const onTimeUpdate = () => {
-      setCurrentTime(formatTime(audio.currentTime));
-      if (Number.isFinite(audio.duration) && audio.duration > 0) {
-        setDuration(formatTime(audio.duration));
-        setProgress((audio.currentTime / audio.duration) * 100);
-      }
-    };
-
-    const onEnded = () => {
-      if (!audio.loop) {
-        handleNext();
-      }
-    };
-
-    audio.addEventListener("timeupdate", onTimeUpdate);
-    audio.addEventListener("ended", onEnded);
-
-    return () => {
-      audio.removeEventListener("timeupdate", onTimeUpdate);
-      audio.removeEventListener("ended", onEnded);
-    };
-  });
 
   async function loadMoreTracks() {
     const response = await fetch(`/api/tracks?limit=30&offset=${trackOffset}`, {
@@ -176,25 +282,35 @@ export default function JTunesApp() {
 
     setCurrentIndex(index);
     setIsPlaying(true);
+
+    if (index === currentIndex && ytReadyRef.current && ytPlayerRef.current) {
+      ytPlayerRef.current.playVideo();
+    }
   }
 
   function togglePlay() {
-    const audio = audioRef.current;
-    if (!audio) return;
-    if (!tracks.length) return;
+    const player = ytPlayerRef.current;
+    if (!player || !ytReadyRef.current || !tracks.length) return;
 
-    if (!audio.src) {
-      setCurrentIndex(0);
-      setIsPlaying(true);
+    const state = player.getPlayerState();
+
+    if (state === window.YT.PlayerState.PLAYING) {
+      player.pauseVideo();
+      setIsPlaying(false);
+      stopProgressWatcher();
       return;
     }
 
-    if (audio.paused) {
-      audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
-    } else {
-      audio.pause();
-      setIsPlaying(false);
+    if (!currentTrack) {
+      return;
     }
+
+    if (state === window.YT.PlayerState.UNSTARTED || state === window.YT.PlayerState.CUED) {
+      player.loadVideoById(currentTrack.youtubeId);
+    }
+
+    player.playVideo();
+    setIsPlaying(true);
   }
 
   function handlePrev() {
@@ -203,41 +319,36 @@ export default function JTunesApp() {
     setIsPlaying(true);
   }
 
-  function handleNext() {
-    if (!tracks.length) return;
-    setCurrentIndex((prev) => (prev + 1) % tracks.length);
-    setIsPlaying(true);
-  }
-
   function handleSeek(nextValue) {
-    const audio = audioRef.current;
-    if (!audio || !Number.isFinite(audio.duration) || audio.duration <= 0) return;
+    const player = ytPlayerRef.current;
+    if (!player || !ytReadyRef.current) return;
+
+    const total = player.getDuration?.() ?? 0;
+    if (!Number.isFinite(total) || total <= 0) return;
 
     const ratio = Number(nextValue) / 100;
-    audio.currentTime = ratio * audio.duration;
+    const nextSeconds = ratio * total;
+    player.seekTo(nextSeconds, true);
     setProgress(Number(nextValue));
+    setCurrentTime(formatTime(nextSeconds));
   }
 
   function toggleLoop() {
-    const nextLoop = !loop;
-    setLoop(nextLoop);
-    if (audioRef.current) {
-      audioRef.current.loop = nextLoop;
-    }
+    setLoop((prev) => !prev);
   }
 
   const viewMeta = {
     discover: {
-      title: "Discover Tracks",
-      subtitle: "Rap-heavy catalog with full-track streaming.",
+      title: "Discover",
+      subtitle: "Real rappers and full YouTube tracks",
     },
     genres: {
-      title: "Genre Pages",
-      subtitle: "Mostly rap genres, from Trap to Drill to Boom Bap.",
+      title: "Genres",
+      subtitle: "Rap-only lanes: trap, drill, boom bap and more",
     },
     artists: {
-      title: "Artist Pages",
-      subtitle: "Profiles, listeners, followers, albums, and songs.",
+      title: "Artists",
+      subtitle: "Only real rapper profiles, albums and songs",
     },
   };
 
@@ -246,13 +357,15 @@ export default function JTunesApp() {
       <div className="bg-glow bg-one" />
       <div className="bg-glow bg-two" />
 
+      <div id="yt-player-host" className="youtube-mini" aria-label="YouTube playback" />
+
       <div className="app-shell">
         <aside className="sidebar glass">
           <div className="brand-wrap">
             <div className="brand-logo">J</div>
             <div>
               <h1>J Tunes</h1>
-              <p>Mobile Rap Wave</p>
+              <p>Rap Mode</p>
             </div>
           </div>
 
@@ -263,19 +376,19 @@ export default function JTunesApp() {
                 className={`nav-btn ${activeView === viewKey ? "active" : ""}`}
                 onClick={() => setActiveView(viewKey)}
               >
-                {viewKey[0].toUpperCase() + viewKey.slice(1)}
+                {viewMeta[viewKey].title}
               </button>
             ))}
           </div>
 
           <div className="stats-grid">
             <article>
-              <h4>{formatCompact(totalTracks || tracks.length)}</h4>
-              <p>Tracks Live</p>
+              <h4>{formatCompact(indexedTracks || totalTracks || tracks.length)}</h4>
+              <p>Indexed Tracks</p>
             </article>
             <article>
-              <h4>{formatCompact(totalArtists || artists.length)}</h4>
-              <p>Artists Live</p>
+              <h4>{formatCompact(indexedArtists || totalArtists || artists.length)}</h4>
+              <p>Indexed Artists</p>
             </article>
             <article>
               <h4>{genreOptions.length}</h4>
@@ -296,7 +409,7 @@ export default function JTunesApp() {
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 type="search"
-                placeholder="Song, rapper, genre"
+                placeholder="Search rapper or song"
               />
             </label>
           </header>
@@ -310,7 +423,7 @@ export default function JTunesApp() {
                 {artists
                   .slice()
                   .sort((a, b) => b.monthlyListeners - a.monthlyListeners)
-                  .slice(0, 16)
+                  .slice(0, 12)
                   .map((artist) => (
                     <button
                       key={artist.id}
@@ -473,7 +586,7 @@ export default function JTunesApp() {
               <div>
                 <h4>Albums</h4>
                 <ul>
-                  {(selectedArtist.albums ?? ["Street Season", "Rap Motion", "Night Stories"]).map((album) => (
+                  {(selectedArtist.albums ?? []).map((album) => (
                     <li key={album}>{album}</li>
                   ))}
                 </ul>
@@ -509,7 +622,7 @@ export default function JTunesApp() {
         <div className="player-controls">
           <div className="control-row">
             <button className="icon-btn" aria-label="Previous track" title="Previous" onClick={handlePrev}>
-              &lt;&lt;
+              &laquo;
             </button>
             <button
               className="play-main icon-btn"
@@ -520,7 +633,7 @@ export default function JTunesApp() {
               {isPlaying ? "||" : ">"}
             </button>
             <button className="icon-btn" aria-label="Next track" title="Next" onClick={handleNext}>
-              &gt;&gt;
+              &raquo;
             </button>
             <button
               className={`icon-btn ${loop ? "loop-on" : ""}`}
@@ -544,8 +657,6 @@ export default function JTunesApp() {
             <span>{duration}</span>
           </div>
         </div>
-
-        <audio ref={audioRef} preload="metadata" />
       </footer>
     </>
   );
