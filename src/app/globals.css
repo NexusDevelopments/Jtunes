@@ -116,7 +116,7 @@ button {
   display: grid;
   grid-template-columns: 1fr;
   gap: 12px;
-  padding: 10px 10px 132px;
+  padding: 10px 10px 190px;
 }
 
 .sidebar {
@@ -282,6 +282,7 @@ button {
   display: flex;
   gap: 10px;
   text-align: left;
+  text-decoration: none;
 }
 
 .artist-chip img {
@@ -339,13 +340,14 @@ button {
   font-size: 0.78rem;
 }
 
-.song-artist-row button {
+.song-artist-link {
   border: none;
   background: transparent;
   color: #9bc2f6;
   cursor: pointer;
   font-size: 0.82rem;
   font-weight: 600;
+  text-decoration: none;
 }
 
 .song-stats-row {
@@ -426,6 +428,13 @@ button {
   justify-content: space-between;
   align-items: center;
   gap: 10px;
+}
+
+.search-song-row img {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  object-fit: cover;
 }
 
 .search-song-row h3 {
@@ -636,13 +645,26 @@ button {
   position: fixed;
   left: 0;
   right: 0;
-  bottom: 0;
+  bottom: 56px;
   z-index: 30;
   border-top: 1px solid var(--stroke);
   padding: 7px 8px;
   display: grid;
   grid-template-columns: 1fr;
   gap: 6px;
+}
+
+.bottom-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 31;
+  border-top: 1px solid var(--stroke);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  padding: 8px;
 }
 
 .player-nav {
@@ -734,7 +756,7 @@ button {
 
 @media (min-width: 740px) {
   .app-shell {
-    padding: 18px 18px 154px;
+    padding: 18px 18px 208px;
   }
 
   .topbar {
@@ -762,7 +784,7 @@ button {
   .app-shell {
     grid-template-columns: 280px 1fr;
     gap: 20px;
-    padding: 24px 24px 132px;
+    padding: 24px 24px 206px;
   }
 
   .sidebar {
@@ -790,9 +812,18 @@ button {
   }
 
   .player {
-    grid-template-columns: 1fr 1fr 1.4fr;
+    grid-template-columns: 1fr 1.4fr;
     padding: 10px 18px;
     gap: 16px;
+  }
+
+  .bottom-nav {
+    left: 0;
+    right: 0;
+    width: 100%;
+    margin: 0;
+    border-radius: 0;
+    padding: 8px 18px;
   }
 }
 

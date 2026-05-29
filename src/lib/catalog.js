@@ -21,7 +21,11 @@ export const artists = [
   { id: "asap-rocky", name: "A$AP Rocky", pfp: "https://i.scdn.co/image/ab6761610000e5ebd6df4f4f7f2b6488c0656f85", monthlyListeners: 29000000, followers: 13000000 },
   { id: "lil-take", name: "Lil Take", pfp: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=600&q=80", monthlyListeners: 56000000, followers: 18000000 },
   { id: "yfg-fatso", name: "YFG Fatso", pfp: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=600&q=80", monthlyListeners: 51000000, followers: 12000000 },
-  { id: "nle-choppa", name: "NLE Choppa", pfp: "https://i.scdn.co/image/ab6761610000e5eb07d55d7d5f0d6e9f31abf6f8", monthlyListeners: 59000000, followers: 19000000 }
+  { id: "nle-choppa", name: "NLE Choppa", pfp: "https://i.scdn.co/image/ab6761610000e5eb07d55d7d5f0d6e9f31abf6f8", monthlyListeners: 59000000, followers: 19000000 },
+  { id: "dee-scoring", name: "Dee Scoring", pfp: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=600&q=80", monthlyListeners: 42000000, followers: 10000000 },
+  { id: "4block-lil-mari", name: "4Block Lil Mari", pfp: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=600&q=80", monthlyListeners: 33000000, followers: 7000000 },
+  { id: "lil-noonie", name: "Lil Noonie", pfp: "https://images.unsplash.com/photo-1499415479124-43c32433a620?auto=format&fit=crop&w=600&q=80", monthlyListeners: 37000000, followers: 7600000 },
+  { id: "topoppgen", name: "Topoppgen", pfp: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=600&q=80", monthlyListeners: 35500000, followers: 6800000 }
 ];
 
 export const albums = [
@@ -39,7 +43,11 @@ export const albums = [
   { id: "invasion-privacy", title: "Invasion of Privacy", artistId: "cardi-b", year: 2018, cover: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1200&q=80" },
   { id: "take-season", title: "Take Season", artistId: "lil-take", year: 2024, cover: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80" },
   { id: "fatso-files", title: "Fatso Files", artistId: "yfg-fatso", year: 2024, cover: "https://images.unsplash.com/photo-1461784180009-21121b2f204c?auto=format&fit=crop&w=1200&q=80" },
-  { id: "cottonwood-2", title: "Cottonwood 2", artistId: "nle-choppa", year: 2023, cover: "https://images.unsplash.com/photo-1494232410401-ad00d5433cfa?auto=format&fit=crop&w=1200&q=80" }
+  { id: "cottonwood-2", title: "Cottonwood 2", artistId: "nle-choppa", year: 2023, cover: "https://images.unsplash.com/photo-1494232410401-ad00d5433cfa?auto=format&fit=crop&w=1200&q=80" },
+  { id: "scoreboard-season", title: "Scoreboard Season", artistId: "dee-scoring", year: 2025, cover: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1200&q=80" },
+  { id: "4block-files", title: "4Block Files", artistId: "4block-lil-mari", year: 2025, cover: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=1200&q=80" },
+  { id: "noonie-nights", title: "Noonie Nights", artistId: "lil-noonie", year: 2025, cover: "https://images.unsplash.com/photo-1499415479124-43c32433a620?auto=format&fit=crop&w=1200&q=80" },
+  { id: "pop-gen", title: "Pop Gen", artistId: "topoppgen", year: 2025, cover: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80" }
 ];
 
 export const tracks = [
@@ -72,7 +80,15 @@ export const tracks = [
   { id: "t27", title: "Big Body", artistId: "yfg-fatso", albumId: "fatso-files", genre: "Rap", duration: "2:42", cover: "https://images.unsplash.com/photo-1461784180009-21121b2f204c?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 34000000 },
   { id: "t28", title: "No Sleep", artistId: "yfg-fatso", albumId: "fatso-files", genre: "Trap", duration: "2:36", cover: "https://images.unsplash.com/photo-1461784180009-21121b2f204c?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 19000000 },
   { id: "t29", title: "Shotta Flow", artistId: "nle-choppa", albumId: "cottonwood-2", genre: "Trap", duration: "2:41", cover: "https://images.unsplash.com/photo-1494232410401-ad00d5433cfa?auto=format&fit=crop&w=1200&q=80", youtubeId: "U-syA2zkN5s", plays: 450000000 },
-  { id: "t30", title: "Capo", artistId: "nle-choppa", albumId: "cottonwood-2", genre: "Rap", duration: "2:31", cover: "https://images.unsplash.com/photo-1494232410401-ad00d5433cfa?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 210000000 }
+  { id: "t30", title: "Capo", artistId: "nle-choppa", albumId: "cottonwood-2", genre: "Rap", duration: "2:31", cover: "https://images.unsplash.com/photo-1494232410401-ad00d5433cfa?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 210000000 },
+  { id: "t31", title: "Scoring Again", artistId: "dee-scoring", albumId: "scoreboard-season", genre: "Rap", duration: "2:48", cover: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 17200000 },
+  { id: "t32", title: "Out The Vault", artistId: "dee-scoring", albumId: "scoreboard-season", genre: "Trap", duration: "2:35", cover: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 12800000 },
+  { id: "t33", title: "Block Talk", artistId: "4block-lil-mari", albumId: "4block-files", genre: "Rap", duration: "2:39", cover: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 11100000 },
+  { id: "t34", title: "Corner Stories", artistId: "4block-lil-mari", albumId: "4block-files", genre: "Trap", duration: "2:56", cover: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 9400000 },
+  { id: "t35", title: "Noonie World", artistId: "lil-noonie", albumId: "noonie-nights", genre: "Rap", duration: "2:32", cover: "https://images.unsplash.com/photo-1499415479124-43c32433a620?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 13000000 },
+  { id: "t36", title: "Late Night Spin", artistId: "lil-noonie", albumId: "noonie-nights", genre: "Melodic Rap", duration: "2:58", cover: "https://images.unsplash.com/photo-1499415479124-43c32433a620?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 8700000 },
+  { id: "t37", title: "Top Pop Out", artistId: "topoppgen", albumId: "pop-gen", genre: "Rap", duration: "2:27", cover: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 9800000 },
+  { id: "t38", title: "Run It Up", artistId: "topoppgen", albumId: "pop-gen", genre: "Trap", duration: "2:44", cover: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 8400000 }
 ];
 
 export const artistById = Object.fromEntries(artists.map((artist) => [artist.id, artist]));

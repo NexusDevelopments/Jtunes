@@ -30,6 +30,7 @@ export default function JTunesApp() {
   const ytPlayerRef = useRef(null);
   const ytReadyRef = useRef(false);
   const progressTimerRef = useRef(null);
+  const searchInputRef = useRef(null);
   const resolveCacheRef = useRef(new Map());
   const resolvePendingRef = useRef(new Map());
 
@@ -59,7 +60,6 @@ export default function JTunesApp() {
   const [duration, setDuration] = useState("0:00");
   const [resolvingKey, setResolvingKey] = useState("");
 
-  const [selectedArtist, setSelectedArtist] = useState(null);
   const [videoModal, setVideoModal] = useState({
     open: false,
     youtubeId: "",
@@ -471,7 +471,15 @@ export default function JTunesApp() {
     [filteredTracks, activeGenre],
   );
 
-  const featuredArtistIds = ["lil-take", "yfg-fatso", "nle-choppa"];
+  const featuredArtistIds = [
+    "lil-take",
+    "yfg-fatso",
+    "dee-scoring",
+    "4block-lil-mari",
+    "lil-noonie",
+    "topoppgen",
+    "nle-choppa",
+  ];
 
   const popularArtists = useMemo(() => {
     const source = hasSearch ? searchArtists : artists;
@@ -663,6 +671,11 @@ export default function JTunesApp() {
     setLoop((prev) => !prev);
   }
 
+  function goToSearch() {
+    setActiveView("discover");
+    searchInputRef.current?.focus();
+  }
+
   const viewMeta = {
     discover: {
       title: "Discover",
@@ -738,6 +751,7 @@ export default function JTunesApp() {
             <label className="search-wrap">
               <span>Search Songs And Artists</span>
               <input
+                ref={searchInputRef}
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 type="search"
@@ -753,17 +767,17 @@ export default function JTunesApp() {
               </div>
               <div className="artist-strip">
                 {popularArtists.map((artist) => (
-                    <button
+                    <Link
                       key={artist.id}
                       className="artist-chip"
-                      onClick={() => setSelectedArtist(artist)}
+                      href={`/artist/${artist.id}`}
                     >
                       <img src={artist.logo || artist.pfp} alt={artist.name} />
                       <div>
                         <h4>{artist.name}</h4>
                         <p>{formatCompact(artist.monthlyListeners)} listeners</p>
                       </div>
-                    </button>
+                    </Link>
                   ))}
               </div>
 
@@ -779,6 +793,7 @@ export default function JTunesApp() {
                   {searchTracks.length ? (
                     searchTracks.map((track) => (
                       <article key={track.id} className="search-song-row">
+                        <img src={track.cover} alt={track.title} />
                         <div>
                           <h3>{track.title}</h3>
                           <p>{track.artist?.name ?? "Unknown Artist"}</p>
@@ -807,7 +822,9 @@ export default function JTunesApp() {
                       <h4>{track.title}</h4>
                       <div className="song-artist-row">
                         <span>Artist</span>
-                        <button onClick={() => setSelectedArtist(track.artist)}>{track.artist?.name}</button>
+                        <Link className="song-artist-link" href={`/artist/${track.artistId}`}>
+                          {track.artist?.name}
+                        </Link>
                       </div>
                       <div className="song-stats-row">
                         <span>{track.genre}</span>
@@ -824,14 +841,9 @@ export default function JTunesApp() {
                         >
                           {resolvingKey === `track-${track.id}` ? "..." : "Play"}
                         </button>
-                        <button
-                          className="icon-btn"
-                          aria-label="Open artist"
-                          title="Artist"
-                          onClick={() => setSelectedArtist(track.artist)}
-                        >
+                        <Link className="icon-btn song-link" href={`/artist/${track.artistId}`} aria-label="Open artist" title="Artist">
                           Artist
-                        </button>
+                        </Link>
                         <Link className="icon-btn song-link" href={`/song/${track.id}`} aria-label="Open song page" title="Song page">
                           Song
                         </Link>
@@ -908,7 +920,9 @@ export default function JTunesApp() {
                       <h4>{track.title}</h4>
                       <div className="song-artist-row">
                         <span>Artist</span>
-                        <button onClick={() => setSelectedArtist(track.artist)}>{track.artist?.name}</button>
+                        <Link className="song-artist-link" href={`/artist/${track.artistId}`}>
+                          {track.artist?.name}
+                        </Link>
                       </div>
                       <div className="song-stats-row">
                         <span>{track.genre}</span>
@@ -925,14 +939,9 @@ export default function JTunesApp() {
                         >
                           {resolvingKey === `track-${track.id}` ? "..." : "Play"}
                         </button>
-                        <button
-                          className="icon-btn"
-                          aria-label="Open artist"
-                          title="Artist"
-                          onClick={() => setSelectedArtist(track.artist)}
-                        >
+                        <Link className="icon-btn song-link" href={`/artist/${track.artistId}`} aria-label="Open artist" title="Artist">
                           Artist
-                        </button>
+                        </Link>
                         <Link className="icon-btn song-link" href={`/song/${track.id}`} aria-label="Open song page" title="Song page">
                           Song
                         </Link>
@@ -968,53 +977,6 @@ export default function JTunesApp() {
         </main>
       </div>
 
-      {!selectedArtist ? null : (
-        <section className="artist-modal" onClick={() => setSelectedArtist(null)}>
-          <div className="artist-modal-inner" onClick={(event) => event.stopPropagation()}>
-            <button className="close-btn" onClick={() => setSelectedArtist(null)}>
-              X
-            </button>
-            <div className="artist-head">
-              <img src={selectedArtist.logo || selectedArtist.pfp} alt={selectedArtist.name} />
-              <div>
-                <h3>{selectedArtist.name}</h3>
-                <p>
-                  {formatCompact(selectedArtist.monthlyListeners)} monthly listeners · {" "}
-                  {formatCompact(selectedArtist.followers)} followers
-                </p>
-              </div>
-            </div>
-
-            <div className="artist-columns">
-              <div>
-                <h4>Albums</h4>
-                <ul>
-                  {(selectedArtist.albums ?? []).map((album) => (
-                    <li key={album}><Link href={`/album/${album.id ?? String(album).toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>{album.title ?? album}</Link></li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h4>Songs</h4>
-                <ul>
-                  {tracks
-                    .filter((track) => track.artistId === selectedArtist.id)
-                    .slice(0, 12)
-                    .map((track) => (
-                      <li key={track.id}>
-                        <span>{track.title}</span>
-                        <button onClick={() => playTrackById(track.id)} disabled={resolvingKey === `track-${track.id}`}>
-                          {resolvingKey === `track-${track.id}` ? "..." : "Play"}
-                        </button>
-                      </li>
-                    ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
       {videoModal.open ? (
         <section className="video-modal" onClick={closeVideoModal}>
           <div className="video-modal-card glass" onClick={(event) => event.stopPropagation()}>
@@ -1037,24 +999,6 @@ export default function JTunesApp() {
       ) : null}
 
       <footer className="player glass">
-        <nav className="player-nav" aria-label="Player navigation">
-          <button
-            className={`player-nav-btn ${activeView === "discover" ? "active" : ""}`}
-            onClick={() => setActiveView("discover")}
-          >
-            Home
-          </button>
-          <button
-            className={`player-nav-btn ${hasSearch ? "active" : ""}`}
-            onClick={() => setActiveView("discover")}
-          >
-            Search
-          </button>
-          <button className="player-nav-btn" disabled>
-            Playlist Not Found
-          </button>
-        </nav>
-
         <div className="now-playing">
           <img src={currentTrack?.cover ?? ""} alt={currentTrack?.title ?? "Track art"} />
           <div>
@@ -1102,6 +1046,30 @@ export default function JTunesApp() {
           </div>
         </div>
       </footer>
+
+      <nav className="bottom-nav glass" aria-label="Bottom app navigation">
+        <button
+          className={`player-nav-btn ${activeView === "discover" && !hasSearch ? "active" : ""}`}
+          onClick={() => {
+            setSearch("");
+            setActiveView("discover");
+          }}
+        >
+          Home
+        </button>
+        <button
+          className={`player-nav-btn ${hasSearch ? "active" : ""}`}
+          onClick={goToSearch}
+        >
+          Search
+        </button>
+        <button
+          className={`player-nav-btn ${activeView === "artists" ? "active" : ""}`}
+          onClick={() => setActiveView("artists")}
+        >
+          Playlist
+        </button>
+      </nav>
     </>
   );
 }
