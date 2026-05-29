@@ -366,6 +366,12 @@ export default function JTunesApp() {
   }, [search]);
 
   useEffect(() => {
+    if (search.trim() && activeView !== "discover") {
+      setActiveView("discover");
+    }
+  }, [search, activeView]);
+
+  useEffect(() => {
     if (!tracks.length) {
       return undefined;
     }
@@ -464,6 +470,23 @@ export default function JTunesApp() {
     () => filteredTracks.filter((track) => track.genre === activeGenre),
     [filteredTracks, activeGenre],
   );
+
+  const featuredArtistIds = ["lil-take", "yfg-fatso", "nle-choppa"];
+
+  const popularArtists = useMemo(() => {
+    const source = hasSearch ? searchArtists : artists;
+    const sourceById = new Map(source.map((artist) => [artist.id, artist]));
+
+    const featured = featuredArtistIds
+      .map((id) => sourceById.get(id))
+      .filter(Boolean);
+
+    const remaining = source
+      .filter((artist) => !featuredArtistIds.includes(artist.id))
+      .sort((a, b) => b.monthlyListeners - a.monthlyListeners);
+
+    return [...featured, ...remaining].slice(0, 12);
+  }, [hasSearch, searchArtists, artists]);
 
   async function loadMoreTracks() {
     const response = await fetch(`/api/tracks?limit=30&offset=${trackOffset}`, {
@@ -729,11 +752,7 @@ export default function JTunesApp() {
                 <h3>Popular Rappers</h3>
               </div>
               <div className="artist-strip">
-                {visibleArtists
-                  .slice()
-                  .sort((a, b) => b.monthlyListeners - a.monthlyListeners)
-                  .slice(0, 12)
-                  .map((artist) => (
+                {popularArtists.map((artist) => (
                     <button
                       key={artist.id}
                       className="artist-chip"
@@ -749,13 +768,39 @@ export default function JTunesApp() {
               </div>
 
               <div className="section-title">
-                <h3>Song Library</h3>
+                <h3>{hasSearch ? "Search Songs" : "Song Library"}</h3>
                 <button className="load-btn" onClick={loadMoreTracks}>
                   Load More
                 </button>
               </div>
-              <div className="song-grid">
-                {filteredTracks.map((track) => (
+
+              {hasSearch ? (
+                <div className="search-song-list">
+                  {searchTracks.length ? (
+                    searchTracks.map((track) => (
+                      <article key={track.id} className="search-song-row">
+                        <div>
+                          <h3>{track.title}</h3>
+                          <p>{track.artist?.name ?? "Unknown Artist"}</p>
+                        </div>
+                        <button
+                          className="primary icon-btn"
+                          aria-label="Play track"
+                          title="Play"
+                          onClick={() => playTrackById(track.id)}
+                          disabled={resolvingKey === `track-${track.id}`}
+                        >
+                          {resolvingKey === `track-${track.id}` ? "..." : "Play"}
+                        </button>
+                      </article>
+                    ))
+                  ) : (
+                    <p className="empty-note">No songs found for this search.</p>
+                  )}
+                </div>
+              ) : (
+                <div className="song-grid">
+                  {filteredTracks.map((track) => (
                   <article key={track.id} className="song-card">
                     <img src={track.cover} alt={track.title} />
                     <div className="song-card-content">
@@ -777,7 +822,7 @@ export default function JTunesApp() {
                           onClick={() => playTrackById(track.id)}
                           disabled={resolvingKey === `track-${track.id}`}
                         >
-                          {resolvingKey === `track-${track.id}` ? "..." : ">"}
+                          {resolvingKey === `track-${track.id}` ? "..." : "Play"}
                         </button>
                         <button
                           className="icon-btn"
@@ -785,16 +830,17 @@ export default function JTunesApp() {
                           title="Artist"
                           onClick={() => setSelectedArtist(track.artist)}
                         >
-                          @
+                          Artist
                         </button>
                         <Link className="icon-btn song-link" href={`/song/${track.id}`} aria-label="Open song page" title="Song page">
-                          #
+                          Song
                         </Link>
                       </div>
                     </div>
                   </article>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
 
               {hasSearch && (externalSearch.tracks.length || externalSearch.artists.length || externalSearch.albums.length) ? (
                 <section className="external-results">
@@ -877,7 +923,7 @@ export default function JTunesApp() {
                           onClick={() => playTrackById(track.id)}
                           disabled={resolvingKey === `track-${track.id}`}
                         >
-                          {resolvingKey === `track-${track.id}` ? "..." : ">"}
+                          {resolvingKey === `track-${track.id}` ? "..." : "Play"}
                         </button>
                         <button
                           className="icon-btn"
@@ -885,10 +931,10 @@ export default function JTunesApp() {
                           title="Artist"
                           onClick={() => setSelectedArtist(track.artist)}
                         >
-                          @
+                          Artist
                         </button>
                         <Link className="icon-btn song-link" href={`/song/${track.id}`} aria-label="Open song page" title="Song page">
-                          #
+                          Song
                         </Link>
                       </div>
                     </div>
@@ -958,7 +1004,7 @@ export default function JTunesApp() {
                       <li key={track.id}>
                         <span>{track.title}</span>
                         <button onClick={() => playTrackById(track.id)} disabled={resolvingKey === `track-${track.id}`}>
-                          {resolvingKey === `track-${track.id}` ? "..." : ">"}
+                          {resolvingKey === `track-${track.id}` ? "..." : "Play"}
                         </button>
                       </li>
                     ))}
@@ -991,6 +1037,24 @@ export default function JTunesApp() {
       ) : null}
 
       <footer className="player glass">
+        <nav className="player-nav" aria-label="Player navigation">
+          <button
+            className={`player-nav-btn ${activeView === "discover" ? "active" : ""}`}
+            onClick={() => setActiveView("discover")}
+          >
+            Home
+          </button>
+          <button
+            className={`player-nav-btn ${hasSearch ? "active" : ""}`}
+            onClick={() => setActiveView("discover")}
+          >
+            Search
+          </button>
+          <button className="player-nav-btn" disabled>
+            Playlist Not Found
+          </button>
+        </nav>
+
         <div className="now-playing">
           <img src={currentTrack?.cover ?? ""} alt={currentTrack?.title ?? "Track art"} />
           <div>
@@ -1010,7 +1074,7 @@ export default function JTunesApp() {
               title={isPlaying ? "Pause" : "Play"}
               onClick={togglePlay}
             >
-              {isPlaying ? "||" : ">"}
+              {isPlaying ? "Pause" : "Play"}
             </button>
             <button className="icon-btn" aria-label="Next track" title="Next" onClick={handleNext}>
               &raquo;

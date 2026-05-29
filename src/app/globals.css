@@ -361,11 +361,13 @@ button {
   margin-top: 8px;
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .icon-btn {
   min-width: 38px;
   min-height: 34px;
+  padding: 0 10px;
   border: 1px solid var(--stroke);
   border-radius: 999px;
   background: linear-gradient(180deg, #1b212a, #141922);
@@ -408,6 +410,41 @@ button {
 .song-actions .primary {
   border: none;
   background: linear-gradient(90deg, var(--blue), var(--blue-2));
+}
+
+.search-song-list {
+  display: grid;
+  gap: 8px;
+}
+
+.search-song-row {
+  border: 1px solid var(--stroke);
+  border-radius: 10px;
+  background: rgba(17, 22, 29, 0.95);
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-song-row h3 {
+  font-size: 1.05rem;
+  line-height: 1.1;
+}
+
+.search-song-row p {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.empty-note {
+  color: var(--muted);
+  font-size: 0.9rem;
+  border: 1px dashed var(--stroke);
+  border-radius: 10px;
+  padding: 12px;
 }
 
 .genre-tabs {
@@ -608,6 +645,32 @@ button {
   gap: 6px;
 }
 
+.player-nav {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.player-nav-btn {
+  border: 1px solid var(--stroke);
+  border-radius: 999px;
+  min-height: 34px;
+  background: rgba(17, 23, 31, 0.95);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.78rem;
+}
+
+.player-nav-btn.active {
+  border-color: transparent;
+  background: linear-gradient(90deg, var(--blue), var(--blue-2));
+}
+
+.player-nav-btn:disabled {
+  opacity: 0.62;
+  cursor: not-allowed;
+}
+
 .now-playing {
   display: flex;
   gap: 10px;
@@ -727,7 +790,7 @@ button {
   }
 
   .player {
-    grid-template-columns: 1fr 1.4fr;
+    grid-template-columns: 1fr 1fr 1.4fr;
     padding: 10px 18px;
     gap: 16px;
   }

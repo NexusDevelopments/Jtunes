@@ -18,7 +18,10 @@ export const artists = [
   { id: "gunna", name: "Gunna", pfp: "https://i.scdn.co/image/ab6761610000e5eb393edf7f091de3d4f9a2e98b", monthlyListeners: 36000000, followers: 12000000 },
   { id: "metro-boomin", name: "Metro Boomin", pfp: "https://i.scdn.co/image/ab6761610000e5eb3f870b2f8c7348035fe1467f", monthlyListeners: 53000000, followers: 15000000 },
   { id: "tyler-the-creator", name: "Tyler, The Creator", pfp: "https://i.scdn.co/image/ab6761610000e5ebd9f8a06b8f401327582f5ea0", monthlyListeners: 47000000, followers: 21000000 },
-  { id: "asap-rocky", name: "A$AP Rocky", pfp: "https://i.scdn.co/image/ab6761610000e5ebd6df4f4f7f2b6488c0656f85", monthlyListeners: 29000000, followers: 13000000 }
+  { id: "asap-rocky", name: "A$AP Rocky", pfp: "https://i.scdn.co/image/ab6761610000e5ebd6df4f4f7f2b6488c0656f85", monthlyListeners: 29000000, followers: 13000000 },
+  { id: "lil-take", name: "Lil Take", pfp: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=600&q=80", monthlyListeners: 56000000, followers: 18000000 },
+  { id: "yfg-fatso", name: "YFG Fatso", pfp: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=600&q=80", monthlyListeners: 51000000, followers: 12000000 },
+  { id: "nle-choppa", name: "NLE Choppa", pfp: "https://i.scdn.co/image/ab6761610000e5eb07d55d7d5f0d6e9f31abf6f8", monthlyListeners: 59000000, followers: 19000000 }
 ];
 
 export const albums = [
@@ -33,7 +36,10 @@ export const albums = [
   { id: "carter-iii", title: "Tha Carter III", artistId: "lil-wayne", year: 2008, cover: "https://images.unsplash.com/photo-1521335629791-ce4aec67dd47?auto=format&fit=crop&w=1200&q=80" },
   { id: "doggystyle", title: "Doggystyle", artistId: "snoop-dogg", year: 1993, cover: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80" },
   { id: "get-rich", title: "Get Rich or Die Tryin'", artistId: "50-cent", year: 2003, cover: "https://images.unsplash.com/photo-1501612780327-45045538702b?auto=format&fit=crop&w=1200&q=80" },
-  { id: "invasion-privacy", title: "Invasion of Privacy", artistId: "cardi-b", year: 2018, cover: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1200&q=80" }
+  { id: "invasion-privacy", title: "Invasion of Privacy", artistId: "cardi-b", year: 2018, cover: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1200&q=80" },
+  { id: "take-season", title: "Take Season", artistId: "lil-take", year: 2024, cover: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80" },
+  { id: "fatso-files", title: "Fatso Files", artistId: "yfg-fatso", year: 2024, cover: "https://images.unsplash.com/photo-1461784180009-21121b2f204c?auto=format&fit=crop&w=1200&q=80" },
+  { id: "cottonwood-2", title: "Cottonwood 2", artistId: "nle-choppa", year: 2023, cover: "https://images.unsplash.com/photo-1494232410401-ad00d5433cfa?auto=format&fit=crop&w=1200&q=80" }
 ];
 
 export const tracks = [
@@ -60,7 +66,13 @@ export const tracks = [
   { id: "t21", title: "In Da Club", artistId: "50-cent", albumId: "get-rich", genre: "Hip-Hop", duration: "3:45", cover: albums[10].cover, youtubeId: "5qm8PH4xAss", plays: 1800000000 },
   { id: "t22", title: "Candy Shop", artistId: "50-cent", albumId: "get-rich", genre: "Hip-Hop", duration: "3:29", cover: albums[10].cover, youtubeId: "SRcnnId15BA", plays: 980000000 },
   { id: "t23", title: "Bodak Yellow", artistId: "cardi-b", albumId: "invasion-privacy", genre: "Trap", duration: "3:43", cover: albums[11].cover, youtubeId: "PEGccV-NOm8", plays: 1200000000 },
-  { id: "t24", title: "WAP", artistId: "cardi-b", albumId: "invasion-privacy", genre: "Rap", duration: "3:12", cover: albums[11].cover, youtubeId: "hsm4poTWjMs", plays: 520000000 }
+  { id: "t24", title: "WAP", artistId: "cardi-b", albumId: "invasion-privacy", genre: "Rap", duration: "3:12", cover: albums[11].cover, youtubeId: "hsm4poTWjMs", plays: 520000000 },
+  { id: "t25", title: "Take It Back", artistId: "lil-take", albumId: "take-season", genre: "Rap", duration: "2:51", cover: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 22000000 },
+  { id: "t26", title: "City Pressure", artistId: "lil-take", albumId: "take-season", genre: "Trap", duration: "3:01", cover: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 18000000 },
+  { id: "t27", title: "Big Body", artistId: "yfg-fatso", albumId: "fatso-files", genre: "Rap", duration: "2:42", cover: "https://images.unsplash.com/photo-1461784180009-21121b2f204c?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 34000000 },
+  { id: "t28", title: "No Sleep", artistId: "yfg-fatso", albumId: "fatso-files", genre: "Trap", duration: "2:36", cover: "https://images.unsplash.com/photo-1461784180009-21121b2f204c?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 19000000 },
+  { id: "t29", title: "Shotta Flow", artistId: "nle-choppa", albumId: "cottonwood-2", genre: "Trap", duration: "2:41", cover: "https://images.unsplash.com/photo-1494232410401-ad00d5433cfa?auto=format&fit=crop&w=1200&q=80", youtubeId: "U-syA2zkN5s", plays: 450000000 },
+  { id: "t30", title: "Capo", artistId: "nle-choppa", albumId: "cottonwood-2", genre: "Rap", duration: "2:31", cover: "https://images.unsplash.com/photo-1494232410401-ad00d5433cfa?auto=format&fit=crop&w=1200&q=80", youtubeId: "", plays: 210000000 }
 ];
 
 export const artistById = Object.fromEntries(artists.map((artist) => [artist.id, artist]));

@@ -2,7 +2,8 @@ import Link from "next/link";
 import { getArtistById } from "@/lib/api";
 
 export default async function ArtistPage({ params }) {
-  const result = getArtistById(params.id);
+  const { id } = await params;
+  const result = getArtistById(id);
   if (!result.ok) {
     return <main className="detail-page"><h1>Artist not found</h1></main>;
   }

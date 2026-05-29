@@ -2,7 +2,8 @@ import Link from "next/link";
 import { getTrackById } from "@/lib/api";
 
 export default async function SongPage({ params }) {
-  const result = getTrackById(params.id);
+  const { id } = await params;
+  const result = getTrackById(id);
   if (!result.ok) {
     return <main className="detail-page"><h1>Song not found</h1></main>;
   }

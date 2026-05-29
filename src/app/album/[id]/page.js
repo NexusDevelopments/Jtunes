@@ -2,7 +2,8 @@ import Link from "next/link";
 import { getAlbumById } from "@/lib/api";
 
 export default async function AlbumPage({ params }) {
-  const result = getAlbumById(params.id);
+  const { id } = await params;
+  const result = getAlbumById(id);
   if (!result.ok) {
     return <main className="detail-page"><h1>Album not found</h1></main>;
   }
