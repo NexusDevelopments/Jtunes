@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 
 function formatCompact(value) {
   return new Intl.NumberFormat("en-US", { notation: "compact" }).format(value);
@@ -580,6 +581,9 @@ export default function JTunesApp() {
                         >
                           @
                         </button>
+                        <Link className="icon-btn song-link" href={`/song/${track.id}`} aria-label="Open song page" title="Song page">
+                          #
+                        </Link>
                       </div>
                     </div>
                   </article>
@@ -636,6 +640,9 @@ export default function JTunesApp() {
                         >
                           @
                         </button>
+                        <Link className="icon-btn song-link" href={`/song/${track.id}`} aria-label="Open song page" title="Song page">
+                          #
+                        </Link>
                       </div>
                     </div>
                   </article>
@@ -659,7 +666,7 @@ export default function JTunesApp() {
                     <h4>{artist.name}</h4>
                     <p>{formatCompact(artist.monthlyListeners)} monthly listeners</p>
                     <p>{formatCompact(artist.followers)} followers</p>
-                    <button onClick={() => setSelectedArtist(artist)}>Open Artist</button>
+                    <Link className="artist-open-link" href={`/artist/${artist.id}`}>Open Artist</Link>
                   </article>
                 ))}
               </div>
@@ -690,7 +697,7 @@ export default function JTunesApp() {
                 <h4>Albums</h4>
                 <ul>
                   {(selectedArtist.albums ?? []).map((album) => (
-                    <li key={album}>{album}</li>
+                    <li key={album}><Link href={`/album/${album.id ?? String(album).toLowerCase().replace(/[^a-z0-9]+/g, "-")}`}>{album.title ?? album}</Link></li>
                   ))}
                 </ul>
               </div>
